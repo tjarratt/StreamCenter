@@ -558,7 +558,7 @@
 				TargetAttributes = {
 					090AB8DD1BA5BFDF00CDB05D = {
 						CreatedOnToolsVersion = 7.1;
-						DevelopmentTeam = 82588XG69F;
+						DevelopmentTeam = XAN2GRZS9J;
 					};
 					09D6E7D01BD2A3B300E88371 = {
 						CreatedOnToolsVersion = 7.1;
@@ -834,13 +834,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Olivier Boucher (82588XG69F)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = "$(inherited)";
 				INFOPLIST_FILE = StreamCenter/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.olivierboucher.scx;
+				PRODUCT_BUNDLE_IDENTIFIER = com.timjarratt.scx;
 				PRODUCT_NAME = StreamCenter;
-				PROVISIONING_PROFILE = "9f02678d-0563-4a83-9a10-52919bdc427f";
+				PROVISIONING_PROFILE = "ad014db7-8f20-4c1e-81a2-1cd0cd83fd3c";
 			};
 			name = Debug;
 		};
@@ -850,14 +851,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Olivier Boucher (82588XG69F)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = "$(inherited)";
 				INFOPLIST_FILE = StreamCenter/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.olivierboucher.scx;
+				PRODUCT_BUNDLE_IDENTIFIER = com.timjarratt.scx;
 				PRODUCT_NAME = StreamCenter;
-				PROVISIONING_PROFILE = "9f02678d-0563-4a83-9a10-52919bdc427f";
+				PROVISIONING_PROFILE = "ad014db7-8f20-4c1e-81a2-1cd0cd83fd3c";
 			};
 			name = Release;
 		};
