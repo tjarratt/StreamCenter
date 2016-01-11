@@ -50,9 +50,7 @@ class TwitchStreamsViewController: LoadingViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
 
-        if self.streams.count == 0 {
-            loadContent()
-        }
+        loadContent()
     }
     
     override func didReceiveMemoryWarning() {
