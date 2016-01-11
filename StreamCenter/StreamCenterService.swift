@@ -64,7 +64,7 @@ class StreamCenterService {
                 
                 if response.result.isSuccess {
                     if let dictionary = response.result.value as? [String : AnyObject] {
-                        guard let token = dictionary["access_token"] as? String, date = dictionary["generated_date"] as? String else {
+                        guard let token = dictionary["access_token"] as? String, _ = dictionary["generated_date"] as? String else {
                             Logger.Error("Could not retrieve desired information from response:\naccess_token\ngenerated_date")
                             completionHandler(token: nil, error: .NoAuthTokenError)
                             return
