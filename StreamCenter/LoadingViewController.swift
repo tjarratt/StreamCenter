@@ -152,13 +152,22 @@ class LoadingViewController : UIViewController, LoadController {
         
         self.view.addConstraint(NSLayoutConstraint(item: topBar, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: TOP_BAR_HEIGHT))
         
-        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[topbar]", options: [], metrics: nil, views: viewDict))
-
-        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[collection]|", options: [], metrics: nil, views: viewDict))
-        
-        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[topbar]|", options: [], metrics: nil, views: viewDict))
-        
-        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[collection]|", options: [], metrics: nil, views: viewDict))
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[topbar]",
+                                                                options: [],
+                                                                metrics: nil,
+                                                                views: viewDict))
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-20-[collection]-20-|",
+                                                                options: [],
+                                                                metrics: nil,
+                                                                views: viewDict))
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[topbar]|",
+                                                                options: [],
+                                                                metrics: nil,
+                                                                views: viewDict))
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-20-[collection]-20-|",
+                                                                options: [],
+                                                                metrics: nil,
+                                                                views: viewDict))
     }
     
     /*
