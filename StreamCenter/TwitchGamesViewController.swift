@@ -52,12 +52,10 @@ class TwitchGamesViewController : LoadingViewController {
     */
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        if self.games.count == 0 {
-            loadContent()
-        }
+
+        loadContent()
     }
-    
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
