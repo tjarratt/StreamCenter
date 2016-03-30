@@ -137,19 +137,6 @@ class TwitchVideoViewController : UIViewController {
     }
     
     /*
-    * initializeChatView()
-    *
-    * Initializes a chat view for the current channel
-    * and displays it
-    */
-    func initializeChatView() {
-        self.chatView = TwitchChatView(frame: CGRect(x: 0, y: 0, width: 400, height: self.view!.bounds.height), channel: self.currentStream!.channel)
-        self.chatView!.startDisplayingMessages()
-        self.chatView?.backgroundColor = UIColor.white
-        self.view.addSubview(self.chatView!)
-    }
-    
-    /*
     * handleLongPress()
     *
     * Handler for the UILongPressGestureRecognizer of the controller
@@ -207,7 +194,6 @@ class TwitchVideoViewController : UIViewController {
                         modalMenu.removeFromSuperview()
                     }
                 })
-//                modalMenu.removeFromSuperview()
                 return true
             }
         }
@@ -245,17 +231,14 @@ class TwitchVideoViewController : UIViewController {
     func showChat() {
         //Resize video view
         var frame = self.videoView?.frame
-        frame?.size.width -= 400
+        frame?.size.width -= 380
         frame?.size.height -= 225
         frame?.origin.y += (225/2)
-        
-        
-        
+
         //The chat view
-        self.chatView = TwitchChatView(frame: CGRect(x: self.view.bounds.width, y: 0, width: 400, height: self.view!.bounds.height), channel: self.currentStream!.channel)
+        self.chatView = TwitchChatView(frame: CGRect(x: self.view.bounds.width, y: 0, width: 380, height: self.view!.bounds.height - 40), channel: self.currentStream!.channel)
         self.chatView!.startDisplayingMessages()
         if let modalMenu = modalMenu {
-            
             self.view.insertSubview(self.chatView!, belowSubview: modalMenu)
         } else {
             self.view.addSubview(self.chatView!)
@@ -265,8 +248,8 @@ class TwitchVideoViewController : UIViewController {
         leftSwipe.isEnabled = false
         
         //animate the showing of the chat view
-        UIView.animate(withDuration: 0.5, animations: { () -> Void in
-            self.chatView!.frame = CGRect(x: self.view.bounds.width - 400, y: 0, width: 400, height: self.view!.bounds.height)
+        UIView.animate(withDuration: 0.5,  animations:{ () -> Void in
+            self.chatView!.frame = CGRect(x: self.view.bounds.width - 400, y: 20, width: 380, height: self.view!.bounds.height - 40)
             if let videoView = self.videoView, let frame = frame {
                 videoView.frame = frame
             }
@@ -276,7 +259,7 @@ class TwitchVideoViewController : UIViewController {
     func hideChat() {
         rightSwipe.isEnabled = false
         leftSwipe.isEnabled = true
-        
+
         //animate the hiding of the chat view
         UIView.animate(withDuration: 0.5, animations: { () -> Void in
             self.videoView!.frame = self.videoViewFrame()
