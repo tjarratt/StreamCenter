@@ -42,33 +42,30 @@ class TwitchVideoViewController : UIViewController {
         self.view.backgroundColor = UIColor.blackColor()
         
         //Gestures configuration
-        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: Selector("handleLongPress:"))
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.handleLongPress(_:)))
         longPressRecognizer.cancelsTouchesInView = true
         self.view.addGestureRecognizer(longPressRecognizer)
         
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: "pause")
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.pause))
         tapRecognizer.allowedPressTypes = [NSNumber(integer: UIPressType.PlayPause.rawValue)]
         self.view.addGestureRecognizer(tapRecognizer)
         
-        let gestureRecognizer = UITapGestureRecognizer(target: self, action: "handleMenuPress")
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.handleMenuPress))
         gestureRecognizer.allowedPressTypes = [UIPressType.Menu.rawValue]
         gestureRecognizer.cancelsTouchesInView = true
         self.view.addGestureRecognizer(gestureRecognizer)
         
-        leftSwipe = UISwipeGestureRecognizer(target: self, action: Selector("swipe:"))
+        leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.swipe(_:)))
         leftSwipe.direction = UISwipeGestureRecognizerDirection.Left
         self.view.addGestureRecognizer(leftSwipe)
         
-        rightSwipe = UISwipeGestureRecognizer(target: self, action: Selector("swipe:"))
+        rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.swipe(_:)))
         rightSwipe.direction = UISwipeGestureRecognizerDirection.Right
         rightSwipe.enabled = false
         self.view.addGestureRecognizer(rightSwipe)
             
         //Modal menu options
         self.modalMenuOptions = [
-            "Live Chat" : [
-                MenuOption(enabledTitle: "Turn off", disabledTitle: "Turn on", enabled: false, onClick:self.handleChatOnOff)
-            ],
             "Stream Quality" : [
                 MenuOption(title: StreamSourceQuality.Source.rawValue, enabled: false, onClick: self.handleQualityChange),
                 MenuOption(title: StreamSourceQuality.High.rawValue, enabled: false, onClick: self.handleQualityChange),

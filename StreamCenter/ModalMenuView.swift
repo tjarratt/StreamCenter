@@ -51,7 +51,7 @@ class ModalMenuView : UIView {
     
     func buildMenuItemViews() {
         var currentIndex = 0
-        for var i = self.menuOptions.count-1; i >= 0; i--  {
+        for var i = self.menuOptions.count-1; i >= 0; i -= 1  {
             let menuTitle = UILabel(frame: self.getFrameForItemAtIndex(currentIndex))
             
             menuTitle.text = self.menuOptions[i].key
@@ -61,13 +61,13 @@ class ModalMenuView : UIView {
             
             self.addSubview(menuTitle)
             
-            for var j = 0; j < self.menuOptions[i].value.count; j++  {
-                currentIndex++
+            for j in 0 ..< self.menuOptions[i].value.count  {
+                currentIndex += 1
                 let optionView = MenuItemView(frame: self.getFrameForItemAtIndex(currentIndex), option: self.menuOptions[i].value[j])
                 
                 self.addSubview(optionView)
             }
-            currentIndex++
+            currentIndex += 1
         }
     }
     
@@ -94,7 +94,7 @@ class MenuItemView : UIView {
         self.option = option
         super.init(frame: frame)
         
-        self.gestureRecognizer = UITapGestureRecognizer(target: self, action: "handleSelect")
+        self.gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(MenuItemView.handleSelect))
         self.gestureRecognizer!.allowedPressTypes = [UIPressType.Select.rawValue]
         self.addGestureRecognizer(self.gestureRecognizer!)
         
