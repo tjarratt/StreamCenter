@@ -1,0 +1,4 @@
+git "https://github.com/Alamofire/Alamofire.git" "3.4.0"
+git "https://github.com/robbiehanson/CocoaAsyncSocket.git" "7.4.3"
+git "https://github.com/pivotal/cedar.git" "v1.0"
+git "https://github.com/pivotal/pivotalcorekit.git" "v0.3.3"

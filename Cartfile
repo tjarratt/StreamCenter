@@ -1,0 +1,8 @@
+# spec dependencies
+git "https://github.com/pivotal/cedar.git"
+git "https://github.com/pivotal/pivotalcorekit.git"
+
+# project dependencies
+git "https://github.com/Alamofire/Alamofire.git"
+git "https://github.com/robbiehanson/CocoaAsyncSocket.git"
+
