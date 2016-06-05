@@ -1,0 +1,6 @@
+[submodule "Externals/Nimble"]
+	path = Externals/Nimble
+	url = https://github.com/quick/nimble
+[submodule "Externals/Quick"]
+	path = Externals/Quick
+	url = https://github.com/quick/quick
