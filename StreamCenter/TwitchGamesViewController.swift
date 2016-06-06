@@ -31,6 +31,7 @@ class TwitchGamesViewController : LoadingViewController {
     private var searchField: UITextField!
     private var games = [TwitchGame]()
     private var twitchButton: UIButton?
+    private var twitchAPIClient : TwitchApi = TwitchApiClient.init() // FIXME: should be injected
     
     convenience init(){
         self.init(nibName: nil, bundle: nil)
@@ -64,7 +65,7 @@ class TwitchGamesViewController : LoadingViewController {
     func loadContent() {
         self.removeErrorView()
         self.displayLoadingView("Loading Games...")
-        TwitchApi.getTopGamesWithOffset(0, limit: 17) {
+        self.twitchAPIClient.getTopGamesWithOffset(0, limit: 17) {
             (games, error) in
             
             guard let games = games else {
@@ -99,7 +100,7 @@ class TwitchGamesViewController : LoadingViewController {
             self.twitchButton?.translatesAutoresizingMaskIntoConstraints = false
             self.twitchButton?.setTitleColor(UIColor.darkGrayColor(), forState: .Normal)
             self.twitchButton?.setTitle("Authenticate", forState: .Normal)
-            self.twitchButton?.addTarget(self, action: Selector("authorizeUser"), forControlEvents: .PrimaryActionTriggered)
+            self.twitchButton?.addTarget(self, action: #selector(TwitchGamesViewController.authorizeUser), forControlEvents: .PrimaryActionTriggered)
         }
         
         let imageView = UIImageView(image: UIImage(named: "twitch"))
@@ -121,7 +122,7 @@ class TwitchGamesViewController : LoadingViewController {
     }
     
     override func loadMore() {
-        TwitchApi.getTopGamesWithOffset(games.count, limit: LOADING_BUFFER) {
+        self.twitchAPIClient.getTopGamesWithOffset(games.count, limit: LOADING_BUFFER) {
             (games, error) in
             
             guard let games = games where games.count > 0 else {

@@ -17,17 +17,20 @@ enum StreamSourceQuality: String {
 }
 
 class TwitchVideoViewController : UIViewController {
-    private var videoView : VideoView?
+    internal var videoView : VideoView?
     private var videoPlayer : AVPlayer?
+    private var chatView : TwitchChatView?
+
+    internal var modalMenu : ModalMenuView?
+    private var modalMenuOptions : [String : [MenuOption]]?
+
     private var streams : [TwitchStreamVideo]?
     private var currentStream : TwitchStream?
-    private var currentStreamVideo: TwitchStreamVideo?
-    private var chatView : TwitchChatView?
-    private var modalMenu : ModalMenuView?
-    private var modalMenuOptions : [String : [MenuOption]]?
-    
-    private var leftSwipe: UISwipeGestureRecognizer!
-    private var rightSwipe: UISwipeGestureRecognizer!
+    private var currentStreamVideo : TwitchStreamVideo?
+    private var leftSwipe : UISwipeGestureRecognizer!
+    private var rightSwipe : UISwipeGestureRecognizer!
+
+    internal var twitchApiClient : TwitchApi!
     
     /*
     * init(stream : TwitchStream)
@@ -35,9 +38,10 @@ class TwitchVideoViewController : UIViewController {
     * Initializes the controller, it's gesture recognizer and modal menu.
     * Loads and prepare the video asset from the stream for display
     */
-    convenience init(stream : TwitchStream){
+    convenience init(stream : TwitchStream, twitchClient: TwitchApi) {
         self.init(nibName: nil, bundle: nil)
         self.currentStream = stream
+        self.twitchApiClient = twitchClient
         
         self.view.backgroundColor = UIColor.blackColor()
         
@@ -77,7 +81,7 @@ class TwitchVideoViewController : UIViewController {
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        TwitchApi.getStreamsForChannel(self.currentStream!.channel.name) {
+        self.twitchApiClient.getStreamsForChannel(self.currentStream!.channel.name) {
             (streams, error) in
             
             if let streams = streams where streams.count > 0 {

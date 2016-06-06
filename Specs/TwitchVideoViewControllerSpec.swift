@@ -8,8 +8,10 @@ class TwitchVideoViewControllerSpec: QuickSpec {
             var subject : TwitchVideoViewController!
             var twitchStream : TwitchStream!
             var twitchChannel : TwitchChannel!
+            var fakeTwitchAPI : FakeTwitchApi!
 
             beforeEach {
+                fakeTwitchAPI = FakeTwitchApi.init()
                 twitchChannel = TwitchChannel.init(
                     id: 1,
                     name: "MySpecialChannel",
@@ -31,11 +33,50 @@ class TwitchVideoViewControllerSpec: QuickSpec {
                     videoHeight: 60,
                     preview: ["key": "value"],
                     channel: twitchChannel)
-                subject = TwitchVideoViewController.init(stream: twitchStream)
+                subject = TwitchVideoViewController.init(stream: twitchStream, twitchClient:fakeTwitchAPI)
             }
 
-            it("it should exist") {
-                expect(subject).toNot(beNil())
+            context("when the view loads and appears") {
+                beforeEach {
+                    fakeTwitchAPI.getStreamsForChannelReturns(())
+
+                    expect(subject.view).toNot(beNil());
+                    subject.viewDidAppear(false)
+                }
+
+                it("should make a request to get the streams for the current channel") {
+                    expect(fakeTwitchAPI.getStreamsForChannelCallCount).to(equal(1));
+
+                    let args = fakeTwitchAPI.getStreamsForChannelArgsForCall(0)
+                    expect(args.0).to(equal("MySpecialChannel"))
+                }
+
+                context("when the user presses the play/pause button") {
+                    beforeEach {
+                        let args = fakeTwitchAPI.getStreamsForChannelArgsForCall(0)
+                        let cb = args.1
+                        let twitchStreamVideo = TwitchStreamVideo.init(
+                            quality: "whatevs",
+                            url: NSURL.init(string: "https://this-that-url")!,
+                            codecs: "some-pretend-codes"
+                        )
+                        cb(streams: [twitchStreamVideo], error: nil)
+                    }
+
+                    it("should dim the video view's opacity") {
+                        expect(subject.videoView?.alpha).to(equal(0.4));
+                    }
+
+                    context("when the play/pause button is pressed again") {
+                        beforeEach {
+
+                        }
+
+                        it("should un-dim the video view") {
+                            expect(subject.videoView?.alpha).to(equal(1));
+                        }
+                    }
+                }
             }
         }
     }

@@ -30,6 +30,7 @@ class TwitchStreamsViewController: LoadingViewController {
     
     private var game : TwitchGame!
     private var streams = [TwitchStream]()
+    private var twitchAPIClient : TwitchApi = TwitchApiClient.init() // FIXME: should be injected
     
     convenience init(game : TwitchGame){
         self.init(nibName: nil, bundle: nil)
@@ -60,7 +61,7 @@ class TwitchStreamsViewController: LoadingViewController {
     func loadContent() {
         self.removeErrorView()
         self.displayLoadingView("Loading Streams...")
-        TwitchApi.getTopStreamsForGameWithOffset(self.game!.name, offset: 0, limit: 20) {
+        self.twitchAPIClient.getTopStreamsForGameWithOffset(self.game!.name, offset: 0, limit: 20) {
             (streams, error) in
             
             guard let streams = streams else {
@@ -89,7 +90,7 @@ class TwitchStreamsViewController: LoadingViewController {
     }
     
     override func loadMore() {
-        TwitchApi.getTopStreamsForGameWithOffset(self.game!.name, offset: self.streams.count, limit: LOADING_BUFFER) {
+        self.twitchAPIClient.getTopStreamsForGameWithOffset(self.game!.name, offset: self.streams.count, limit: LOADING_BUFFER) {
             (streams, error) in
             
             guard let streams = streams else {
@@ -137,7 +138,7 @@ extension TwitchStreamsViewController {
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         let selectedStream = streams[indexPath.row]
-        let videoViewController = TwitchVideoViewController(stream: selectedStream)
+        let videoViewController = TwitchVideoViewController(stream: selectedStream, twitchClient: TwitchApiClient.init())
         
         self.presentViewController(videoViewController, animated: true, completion: nil)
     }

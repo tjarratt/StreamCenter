@@ -22,7 +22,8 @@ class TwitchChatMessageQueue {
     let delegate : TwitchChatMessageQueueDelegate
     let messageQueue : Queue<IRCMessage>
     let mqMutex : dispatch_semaphore_t
-    
+
+    private var twitchAPIClient : TwitchApi = TwitchApiClient.init() // FIXME: should be injected
     
     init(delegate : TwitchChatMessageQueueDelegate) {
         self.mqMutex = dispatch_semaphore_create(1)
@@ -71,7 +72,7 @@ class TwitchChatMessageQueue {
                 for emote in twitchMessage.emotes {
                     if !self.delegate.hasEmoteInCache(emote.0){
                         dispatch_group_enter(downloadGroup)
-                        Alamofire.request(.GET, TwitchApi.getEmoteUrlStringFromId(emote.0)).response() {
+                        Alamofire.request(.GET, self.twitchAPIClient.getEmoteUrlStringFromId(emote.0)).response() {
                             (_, _, data, error) in
                             if error != nil {
                                 Logger.Error("Could not download emote image for id: \(emote.0)")

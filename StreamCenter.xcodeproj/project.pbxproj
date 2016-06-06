@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		090AB8E91BA5BFDF00CDB05D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 090AB8E81BA5BFDF00CDB05D /* Assets.xcassets */; };
-		090AB8FD1BA616A900CDB05D /* TwitchApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090AB8F11BA5C80700CDB05D /* TwitchApi.swift */; };
 		090AB8FE1BA616A900CDB05D /* TwitchGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090AB8F71BA5F56900CDB05D /* TwitchGame.swift */; };
 		090AB8FF1BA616A900CDB05D /* TwitchChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090AB8FB1BA6049000CDB05D /* TwitchChannel.swift */; };
 		090AB9001BA616A900CDB05D /* TwitchStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090AB8F91BA5FEB800CDB05D /* TwitchStream.swift */; };
@@ -68,6 +67,10 @@
 		F7DB8C5C1D03B880004443EE /* TwitchVideoViewControllerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DB8C5B1D03B880004443EE /* TwitchVideoViewControllerSpec.swift */; };
 		F7DB8C651D03B88D004443EE /* Nimble.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7DB8C4F1D03B85A004443EE /* Nimble.framework */; };
 		F7DB8C861D04E2D5004443EE /* Quick.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7DB8C7F1D04E2C1004443EE /* Quick.framework */; };
+		F7DB8C991D04E76D004443EE /* TwitchApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DB8C981D04E76D004443EE /* TwitchApi.swift */; };
+		F7DB8C9E1D04EEA1004443EE /* TwitchApiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DB8C9D1D04EEA1004443EE /* TwitchApiClient.swift */; };
+		F7DB8CA11D04F02D004443EE /* FakeTwitchApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DB8CA01D04F025004443EE /* FakeTwitchApi.swift */; };
+		F7DB8CA41D04F76C004443EE /* AsyncMainQueueRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DB8CA31D04F76C004443EE /* AsyncMainQueueRunner.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -220,7 +223,6 @@
 		090AB8E31BA5BFDF00CDB05D /* TwitchGamesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchGamesViewController.swift; sourceTree = "<group>"; };
 		090AB8E81BA5BFDF00CDB05D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		090AB8EA1BA5BFDF00CDB05D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		090AB8F11BA5C80700CDB05D /* TwitchApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchApi.swift; sourceTree = "<group>"; };
 		090AB8F31BA5DA1400CDB05D /* M3UParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = M3UParser.swift; sourceTree = "<group>"; };
 		090AB8F51BA5DD6300CDB05D /* TwitchStreamVideo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchStreamVideo.swift; sourceTree = "<group>"; };
 		090AB8F71BA5F56900CDB05D /* TwitchGame.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchGame.swift; sourceTree = "<group>"; };
@@ -279,6 +281,11 @@
 		F7DB8C5B1D03B880004443EE /* TwitchVideoViewControllerSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitchVideoViewControllerSpec.swift; sourceTree = "<group>"; };
 		F7DB8C5D1D03B880004443EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F7DB8C661D04E2C1004443EE /* Quick.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Quick.xcodeproj; path = Externals/Quick/Quick.xcodeproj; sourceTree = "<group>"; };
+		F7DB8C981D04E76D004443EE /* TwitchApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchApi.swift; sourceTree = "<group>"; };
+		F7DB8C9D1D04EEA1004443EE /* TwitchApiClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchApiClient.swift; sourceTree = "<group>"; };
+		F7DB8CA01D04F025004443EE /* FakeTwitchApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeTwitchApi.swift; sourceTree = "<group>"; };
+		F7DB8CA31D04F76C004443EE /* AsyncMainQueueRunner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncMainQueueRunner.swift; sourceTree = "<group>"; };
+		F7DB8CA91D04F9D1004443EE /* FakeAyncMainQueueRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeAyncMainQueueRunner.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -326,13 +333,13 @@
 		090AB8E01BA5BFDF00CDB05D /* StreamCenter */ = {
 			isa = PBXGroup;
 			children = (
-				09D098231BA7663A00E7E6FC /* ViewControllers */,
-				090AB9051BA6366500CDB05D /* Views */,
-				090AB8F01BA5C7EC00CDB05D /* TwitchAPI */,
-				09CE59831BAE456D0054EB71 /* Helpers */,
+				090AB8EA1BA5BFDF00CDB05D /* Info.plist */,
 				090AB8E11BA5BFDF00CDB05D /* AppDelegate.swift */,
 				090AB8E81BA5BFDF00CDB05D /* Assets.xcassets */,
-				090AB8EA1BA5BFDF00CDB05D /* Info.plist */,
+				09CE59831BAE456D0054EB71 /* Helpers */,
+				090AB8F01BA5C7EC00CDB05D /* TwitchAPI */,
+				09D098231BA7663A00E7E6FC /* ViewControllers */,
+				090AB9051BA6366500CDB05D /* Views */,
 			);
 			path = StreamCenter;
 			sourceTree = "<group>";
@@ -340,14 +347,16 @@
 		090AB8F01BA5C7EC00CDB05D /* TwitchAPI */ = {
 			isa = PBXGroup;
 			children = (
-				090AB8F11BA5C80700CDB05D /* TwitchApi.swift */,
-				090AB8F71BA5F56900CDB05D /* TwitchGame.swift */,
+				F7DB8C981D04E76D004443EE /* TwitchApi.swift */,
+				F7DB8C9D1D04EEA1004443EE /* TwitchApiClient.swift */,
 				090AB8FB1BA6049000CDB05D /* TwitchChannel.swift */,
+				090AB8F71BA5F56900CDB05D /* TwitchGame.swift */,
 				090AB8F91BA5FEB800CDB05D /* TwitchStream.swift */,
 				090AB8F51BA5DD6300CDB05D /* TwitchStreamVideo.swift */,
 				09CE59841BAF559D0054EB71 /* Chat */,
+				F7DB8C9F1D04F025004443EE /* fakes */,
 			);
-			name = TwitchAPI;
+			path = TwitchAPI;
 			sourceTree = "<group>";
 		};
 		090AB9051BA6366500CDB05D /* Views */ = {
@@ -371,7 +380,7 @@
 			children = (
 				090AB9211BB3699700CDB05D /* TwitchChatView.swift */,
 			);
-			name = Views;
+			path = Views;
 			sourceTree = "<group>";
 		};
 		091277B01BE13E270003036D /* Analytics */ = {
@@ -380,7 +389,7 @@
 				091277B11BE13E350003036D /* Mixpanel.swift */,
 				091277B51BE150B90003036D /* Event.swift */,
 			);
-			name = Analytics;
+			path = Analytics;
 			sourceTree = "<group>";
 		};
 		091277B71BE180770003036D /* Logging */ = {
@@ -388,7 +397,7 @@
 			children = (
 				091277B81BE180820003036D /* Logger.swift */,
 			);
-			name = Logging;
+			path = Logging;
 			sourceTree = "<group>";
 		};
 		09199A1B1BBABC9100B10543 /* Extensions */ = {
@@ -401,7 +410,7 @@
 				09D6E7E31BD3065200E88371 /* NSData.swift */,
 				091277BA1BE187E10003036D /* NSDateFormatter.swift */,
 			);
-			name = Extensions;
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		09199A1E1BBAD0D000B10543 /* Abstract */ = {
@@ -416,22 +425,23 @@
 		09CE59831BAE456D0054EB71 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				091277B71BE180770003036D /* Logging */,
-				091277B01BE13E270003036D /* Analytics */,
-				09F106161BD6B28E00DE0126 /* JSON */,
-				09F1060C1BD6988600DE0126 /* Websockets */,
-				09D6E7E51BD30E4100E88371 /* IRC */,
-				B4A2E6CE1BD01AEF0094AECA /* StreamCenterService.swift */,
 				09D6E7F21BD401E700E88371 /* ChatManagerConsumer.swift */,
-				090AB8F31BA5DA1400CDB05D /* M3UParser.swift */,
-				09CE59891BAF5F870054EB71 /* Queue.swift */,
 				09CE598B1BAF963C0054EB71 /* ConcurrencyHelpers.swift */,
-				B4D15C7B1BCDCBA2006FFB5D /* QRCodeGenerator.swift */,
-				B4D15C7F1BCDD3E3006FFB5D /* TokenHelper.swift */,
 				B4D15C811BCDFC6C006FFB5D /* Keychain.swift */,
+				090AB8F31BA5DA1400CDB05D /* M3UParser.swift */,
+				B4D15C7B1BCDCBA2006FFB5D /* QRCodeGenerator.swift */,
+				09CE59891BAF5F870054EB71 /* Queue.swift */,
+				B4A2E6CE1BD01AEF0094AECA /* StreamCenterService.swift */,
+				B4D15C7F1BCDD3E3006FFB5D /* TokenHelper.swift */,
+				091277B01BE13E270003036D /* Analytics */,
+				F7DB8CA21D04F731004443EE /* Async */,
 				09199A1B1BBABC9100B10543 /* Extensions */,
+				09D6E7E51BD30E4100E88371 /* IRC */,
+				09F106161BD6B28E00DE0126 /* JSON */,
+				091277B71BE180770003036D /* Logging */,
+				09F1060C1BD6988600DE0126 /* Websockets */,
 			);
-			name = Helpers;
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		09CE59841BAF559D0054EB71 /* Chat */ = {
@@ -442,7 +452,7 @@
 				09CE59871BAF55CE0054EB71 /* TwitchChatMessageQueue.swift */,
 				090AB91A1BB3698800CDB05D /* Views */,
 			);
-			name = Chat;
+			path = Chat;
 			sourceTree = "<group>";
 		};
 		09D098231BA7663A00E7E6FC /* ViewControllers */ = {
@@ -465,7 +475,7 @@
 				09D6E7F01BD400C000E88371 /* IRCEndpoint.swift */,
 				0912776F1BD461DF0003036D /* IRCMessage.swift */,
 			);
-			name = IRC;
+			path = IRC;
 			sourceTree = "<group>";
 		};
 		09F1060C1BD6988600DE0126 /* Websockets */ = {
@@ -474,7 +484,7 @@
 				09F1060D1BD698F800DE0126 /* WebSocket.swift */,
 				09F1060F1BD6992200DE0126 /* SSLSecurity.swift */,
 			);
-			name = Websockets;
+			path = Websockets;
 			sourceTree = "<group>";
 		};
 		09F106161BD6B28E00DE0126 /* JSON */ = {
@@ -482,7 +492,7 @@
 			children = (
 				09F106171BD6B2AA00DE0126 /* SwiftyJSON.swift */,
 			);
-			name = JSON;
+			path = JSON;
 			sourceTree = "<group>";
 		};
 		B4FB52AF1BCF27E600C57B0B /* Twitch */ = {
@@ -544,6 +554,31 @@
 				F7DB8C831D04E2C1004443EE /* QuickFocused-tvOSTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		F7DB8C9F1D04F025004443EE /* fakes */ = {
+			isa = PBXGroup;
+			children = (
+				F7DB8CA01D04F025004443EE /* FakeTwitchApi.swift */,
+			);
+			path = fakes;
+			sourceTree = "<group>";
+		};
+		F7DB8CA21D04F731004443EE /* Async */ = {
+			isa = PBXGroup;
+			children = (
+				F7DB8CA31D04F76C004443EE /* AsyncMainQueueRunner.swift */,
+				F7DB8CA81D04F9D1004443EE /* fakes */,
+			);
+			path = Async;
+			sourceTree = "<group>";
+		};
+		F7DB8CA81D04F9D1004443EE /* fakes */ = {
+			isa = PBXGroup;
+			children = (
+				F7DB8CA91D04F9D1004443EE /* FakeAyncMainQueueRunner.swift */,
+			);
+			path = fakes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -767,7 +802,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				090AB8FD1BA616A900CDB05D /* TwitchApi.swift in Sources */,
 				B4E9F8001BCF83CC0026708F /* TwitchAuthViewController.swift in Sources */,
 				B4D3103B1BD154320091448F /* UIView.swift in Sources */,
 				090AB8FE1BA616A900CDB05D /* TwitchGame.swift in Sources */,
@@ -788,6 +822,7 @@
 				090AB9001BA616A900CDB05D /* TwitchStream.swift in Sources */,
 				B4E75B1F1BD74E8F00C1E6BA /* ChatTopView.swift in Sources */,
 				09CE598A1BAF5F870054EB71 /* Queue.swift in Sources */,
+				F7DB8C991D04E76D004443EE /* TwitchApi.swift in Sources */,
 				09EB6D3E1BB484F7003EB244 /* String.swift in Sources */,
 				09D6E7ED1BD3FBCD00E88371 /* IRCConnectionDelegate.swift in Sources */,
 				09D6E7F11BD400C000E88371 /* IRCEndpoint.swift in Sources */,
@@ -816,9 +851,11 @@
 				09D098251BA7666200E7E6FC /* TwitchStreamsViewController.swift in Sources */,
 				090AB9041BA616A900CDB05D /* TwitchGamesViewController.swift in Sources */,
 				B44A44671BC6CAB800F399EC /* ItemCellView.swift in Sources */,
+				F7DB8C9E1D04EEA1004443EE /* TwitchApiClient.swift in Sources */,
 				09D0982B1BA782C800E7E6FC /* VideoView.swift in Sources */,
 				09CE59861BAF55BD0054EB71 /* TwitchChatMessage.swift in Sources */,
 				09CE598C1BAF963C0054EB71 /* ConcurrencyHelpers.swift in Sources */,
+				F7DB8CA41D04F76C004443EE /* AsyncMainQueueRunner.swift in Sources */,
 				B4D15C821BCDFC6C006FFB5D /* Keychain.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -827,6 +864,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F7DB8CA11D04F02D004443EE /* FakeTwitchApi.swift in Sources */,
 				F7DB8C5C1D03B880004443EE /* TwitchVideoViewControllerSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

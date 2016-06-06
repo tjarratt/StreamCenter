@@ -55,6 +55,7 @@ class TwitchSearchResultsViewController: LoadingViewController {
     private var streams = [TwitchStream]()
     
     private var searchTypeControl: UISegmentedControl!
+    private var twitchAPIClient : TwitchApi = TwitchApiClient.init() // FIXME: should be injected
     
     convenience init(searchTerm term: String) {
         self.init(nibName: nil, bundle: nil)
@@ -90,7 +91,7 @@ class TwitchSearchResultsViewController: LoadingViewController {
     func loadContent() {
         self.removeErrorView()
         self.displayLoadingView("Loading Results...")
-        TwitchApi.getGamesWithSearchTerm(searchTerm, offset: 0, limit: LOADING_BUFFER) { (games, error) -> () in
+        self.twitchAPIClient.getGamesWithSearchTerm(searchTerm, offset: 0, limit: LOADING_BUFFER) { (games, error) -> () in
             guard let games = games else {
                 dispatch_async(dispatch_get_main_queue(), {
                     self.removeLoadingView()
@@ -106,7 +107,7 @@ class TwitchSearchResultsViewController: LoadingViewController {
                 self.collectionView.reloadData()
             })
         }
-        TwitchApi.getStreamsWithSearchTerm(searchTerm, offset: 0, limit: LOADING_BUFFER) { (streams, error) -> () in
+        self.twitchAPIClient.getStreamsWithSearchTerm(searchTerm, offset: 0, limit: LOADING_BUFFER) { (streams, error) -> () in
             guard let streams = streams else {
                 dispatch_async(dispatch_get_main_queue(), {
                     self.removeLoadingView()
@@ -131,7 +132,7 @@ class TwitchSearchResultsViewController: LoadingViewController {
         self.searchTypeControl.translatesAutoresizingMaskIntoConstraints = false
         self.searchTypeControl.selectedSegmentIndex = 0
         self.searchTypeControl.setTitleTextAttributes([NSForegroundColorAttributeName : UIColor(white: 0.45, alpha: 1)], forState: .Normal)
-        self.searchTypeControl.addTarget(self, action: Selector("changedSearchType:"), forControlEvents: .ValueChanged)
+        self.searchTypeControl.addTarget(self, action: #selector(TwitchSearchResultsViewController.changedSearchType(_:)), forControlEvents: .ValueChanged)
         
         super.configureViews("Search Results - \(searchTerm)", centerView: nil, leftView: self.searchTypeControl, rightView: nil)
     }
@@ -155,7 +156,7 @@ class TwitchSearchResultsViewController: LoadingViewController {
     
     override func loadMore() {
         if searchType == .Stream {
-            TwitchApi.getStreamsWithSearchTerm(self.searchTerm, offset: self.streams.count, limit: LOADING_BUFFER, completionHandler: { (streams, error) -> () in
+            self.twitchAPIClient.getStreamsWithSearchTerm(self.searchTerm, offset: self.streams.count, limit: LOADING_BUFFER, completionHandler: { (streams, error) -> () in
                 guard let streams = streams else {
                     return
                 }
@@ -209,7 +210,7 @@ extension TwitchSearchResultsViewController {
             self.presentViewController(streamViewController, animated: true, completion: nil)
         case .Stream:
             let selectedStream = streams[indexPath.row]
-            let videoViewController = TwitchVideoViewController(stream: selectedStream)
+            let videoViewController = TwitchVideoViewController(stream: selectedStream, twitchClient: TwitchApiClient.init())
             
             self.presentViewController(videoViewController, animated: true, completion: nil)
         }
