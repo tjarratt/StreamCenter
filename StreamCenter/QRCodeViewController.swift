@@ -45,12 +45,12 @@ class QRCodeViewController: UIViewController {
         
         let authButton = UIButton(type: .System)
         authButton.translatesAutoresizingMaskIntoConstraints = false
-        authButton.addTarget(self, action: Selector("processCode"), forControlEvents: .PrimaryActionTriggered)
+        authButton.addTarget(self, action: #selector(QRCodeViewController.processCode), forControlEvents: .PrimaryActionTriggered)
         authButton.setTitle("Process", forState: .Normal)
         
         let cancelButton = UIButton(type: .System)
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
-        cancelButton.addTarget(self, action: Selector("cancel"), forControlEvents: .PrimaryActionTriggered)
+        cancelButton.addTarget(self, action: #selector(QRCodeViewController.cancel), forControlEvents: .PrimaryActionTriggered)
         cancelButton.setTitle("Cancel", forState: .Normal)
         
         self.view.addSubview(titleLabel)

@@ -51,7 +51,7 @@ class ModalMenuView : UIView {
     
     func buildMenuItemViews() {
         var currentIndex = 0
-        for var i = self.menuOptions.count-1; i >= 0; i -= 1  {
+        for i in (0 ..< self.menuOptions.count - 1).reverse() {
             let menuTitle = UILabel(frame: self.getFrameForItemAtIndex(currentIndex))
             
             menuTitle.text = self.menuOptions[i].key

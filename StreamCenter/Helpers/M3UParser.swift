@@ -14,7 +14,7 @@ class M3UParser {
         var resultArray = [TwitchStreamVideo]()
         
         if(dataByLine[0] == "#EXTM3U"){
-            for (var i = 1; i < dataByLine.count; i++) {
+            for i in (1 ..< dataByLine.count) {
                 if(dataByLine[i].hasPrefix("#EXT-X-STREAM-INF:PROGRAM-ID=1,")){
                     let line = dataByLine[i]
                     var codecs : String?
@@ -23,8 +23,11 @@ class M3UParser {
                     
                     if let codecsRange = line.rangeOfString("CODECS=\"") {
                         if let videoRange = line.rangeOfString("VIDEO=\"") {
-                            codecs = line.substringWithRange(Range<String.Index>(start: codecsRange.endIndex, end:videoRange.startIndex.advancedBy(-2)))
-                            quality = line.substringWithRange(Range<String.Index>(start: videoRange.endIndex, end:line.endIndex.advancedBy(-1)))
+                            let codesTypeRange : Range = codecsRange.endIndex ..< videoRange.startIndex.advancedBy(-2)
+                            codecs = line.substringWithRange(codesTypeRange)
+
+                            let qualityRange : Range = videoRange.endIndex ..< line.endIndex.advancedBy(-1)
+                            quality = line.substringWithRange(qualityRange)
                             
                             if(dataByLine[i+1].hasPrefix("http")){
                                 url = NSURL(string: dataByLine[i+1].stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!)

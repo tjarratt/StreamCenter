@@ -32,7 +32,8 @@ extension String {
         get {
             let subStart = self.startIndex.advancedBy(r.startIndex, limit: self.endIndex)
             let subEnd = subStart.advancedBy(r.endIndex - r.startIndex, limit: self.endIndex)
-            return self.substringWithRange(Range(start: subStart, end: subEnd))
+            let range : Range = subStart ..< subEnd
+            return self.substringWithRange(range)
         }
     }
     subscript (i: Int) -> Character {
@@ -74,8 +75,8 @@ extension String {
         let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         
         var randomString = ""
-        
-        for (var i=0; i < len; i++){
+
+        for _ in (0 ..< len) {
             let length = UInt32(letters.characters.count)
             let rand = Int(arc4random_uniform(length))
             randomString.append(letters[letters.startIndex.advancedBy(rand)])

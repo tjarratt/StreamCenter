@@ -427,15 +427,15 @@ class IRCConnection {
             var done : Bool = false
             
             func checkAndMarkIfDone() { if currentIndex == len - 1 { done = true } }
-            func consumeWhitespace() { while(messageString[currentIndex] == " " && currentIndex != len - 1 && !done) { currentIndex++ } }
+            func consumeWhitespace() { while(messageString[currentIndex] == " " && currentIndex != len - 1 && !done) { currentIndex += 1 } }
             func notEndOfLine() -> Bool { return currentIndex != len - 1 && !done }
             
             if len > 2 {
                 if notEndOfLine() {
                     if messageString[currentIndex] == "@" {
-                        currentIndex++
+                        currentIndex += 1
                         let startIndex = currentIndex
-                        while notEndOfLine() && messageString[currentIndex] != " " { currentIndex++ }
+                        while notEndOfLine() && messageString[currentIndex] != " " { currentIndex += 1 }
                         let endIndex = currentIndex
                         
                         intentOrTags = messageString[startIndex...endIndex-1]
@@ -446,25 +446,25 @@ class IRCConnection {
                 
                 if notEndOfLine() && messageString[currentIndex] == ":" {
                     // prefix: ':' <sender> [ '!' <user> ] [ '@' <host> ] ' ' { ' ' }
-                    currentIndex++
+                    currentIndex += 1
                     let senderStartIndex = currentIndex
                     while notEndOfLine() &&
                         messageString[currentIndex] != " " &&
                         messageString[currentIndex] != "!" &&
                         messageString[currentIndex] != "@"
-                        { currentIndex++ }
+                        { currentIndex += 1 }
                     let senderEndIndex = currentIndex
                     
                     sender = messageString[senderStartIndex...senderEndIndex-1]
                     checkAndMarkIfDone()
                     
                     if !done && messageString[currentIndex] != "!" {
-                        currentIndex++
+                        currentIndex += 1
                         let userStartIndex = currentIndex
                         while notEndOfLine() &&
                             messageString[currentIndex] != " " &&
                             messageString[currentIndex] != "@"
-                            { currentIndex++ }
+                            { currentIndex += 1 }
                         let userEndIndex = currentIndex
                         
                         user = messageString[userStartIndex...userEndIndex-1]
@@ -472,16 +472,16 @@ class IRCConnection {
                     }
                     
                     if !done && messageString[currentIndex] != "@" {
-                        currentIndex++
+                        currentIndex += 1
                         let hostStartIndex = currentIndex
-                        while notEndOfLine() && messageString[currentIndex] != " " { currentIndex++ }
+                        while notEndOfLine() && messageString[currentIndex] != " " { currentIndex += 1 }
                         let hostEndIndex = currentIndex
                         
                         host = messageString[hostStartIndex...hostEndIndex-1]
                         checkAndMarkIfDone()
                     }
                     
-                    if !done { currentIndex++ }
+                    if !done { currentIndex += 1 }
                     consumeWhitespace()
                 }
                 
@@ -490,13 +490,13 @@ class IRCConnection {
                     // letter: 'a' ... 'z' | 'A' ... 'Z'
                     // number: '0' ... '9'
                     let cmdStartIndex = currentIndex
-                    while notEndOfLine() && messageString[currentIndex] != " " { currentIndex++ }
+                    while notEndOfLine() && messageString[currentIndex] != " " { currentIndex += 1 }
                     let cmdEndIndex = currentIndex
                     
                     command = messageString[cmdStartIndex...cmdEndIndex-1]
                     
                     checkAndMarkIfDone()
-                    if !done { currentIndex++ }
+                    if !done { currentIndex += 1 }
                     consumeWhitespace()
                 }
                 
@@ -505,7 +505,7 @@ class IRCConnection {
                     var currentParameter : String?
                     
                     if messageString[currentIndex] == ":" {
-                        currentIndex++
+                        currentIndex += 1
                         let currentParamStartIndex = currentIndex
                         
                         currentParameter = messageString[currentParamStartIndex...len - 1]
@@ -513,13 +513,13 @@ class IRCConnection {
                     }
                     else {
                         let currentParamStartIndex = currentIndex
-                        while notEndOfLine() && messageString[currentIndex] != " " { currentIndex++ }
+                        while notEndOfLine() && messageString[currentIndex] != " " { currentIndex += 1 }
                         let currentParamEndIndex = currentIndex
                         
                         currentParameter = messageString[currentParamStartIndex...currentParamEndIndex-1]
                         
                         checkAndMarkIfDone()
-                        if !done { currentIndex++ }
+                        if !done { currentIndex += 1 }
                     }
                     
                     if let param = currentParameter as String! {

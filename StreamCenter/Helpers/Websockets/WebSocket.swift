@@ -218,7 +218,7 @@ public class WebSocket : NSObject, NSStreamDelegate {
     private func generateWebSocketKey() -> String {
         var key = ""
         let seed = 16
-        for (var i = 0; i < seed; i++) {
+        for _ in (0 ..< seed) {
             let uni = UnicodeScalar(UInt32(97 + arc4random_uniform(25)))
             key += "\(Character(uni))"
         }
@@ -375,9 +375,9 @@ public class WebSocket : NSObject, NSStreamDelegate {
         let CRLFBytes = [UInt8(ascii: "\r"), UInt8(ascii: "\n"), UInt8(ascii: "\r"), UInt8(ascii: "\n")]
         var k = 0
         var totalSize = 0
-        for var i = 0; i < bufferLen; i++ {
+        for i in (0 ..< bufferLen) {
             if buffer[i] == CRLFBytes[k] {
-                k++
+                k += 1
                 if k == 3 {
                     totalSize = i + 1
                     break
@@ -581,7 +581,7 @@ public class WebSocket : NSObject, NSStreamDelegate {
             }
             if response != nil {
                 response!.bytesLeft -= Int(len)
-                response!.frameCount++
+                response!.frameCount += 1
                 response!.isFin = isFin > 0 ? true : false
                 if(isNew) {
                     readStack.append(response!)
@@ -689,7 +689,7 @@ public class WebSocket : NSObject, NSStreamDelegate {
             SecRandomCopyBytes(kSecRandomDefault, Int(sizeof(UInt32)), maskKey)
             offset += sizeof(UInt32)
             
-            for (var i = 0; i < dataLength; i++) {
+            for i in (0 ..< dataLength) {
                 buffer[offset] = bytes[i] ^ maskKey[i % sizeof(UInt32)]
                 offset += 1
             }

@@ -97,7 +97,7 @@ class LoadingViewController : UIViewController, LoadController {
         self.view.addSubview(self.reloadLabel!)
         
         //Gestures configuration
-        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: Selector("handleLongPress:"))
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(LoadingViewController.handleLongPress(_:)))
         longPressRecognizer.cancelsTouchesInView = true
         self.view.addGestureRecognizer(longPressRecognizer)
     }
