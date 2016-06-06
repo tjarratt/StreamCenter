@@ -998,7 +998,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.timjarratt.scx;
 				PRODUCT_NAME = StreamCenter;
-				PROVISIONING_PROFILE = "ad014db7-8f20-4c1e-81a2-1cd0cd83fd3c";
+				PROVISIONING_PROFILE = "117ec930-3252-437c-b5e0-3b62922a9d93";
 			};
 			name = Debug;
 		};
@@ -1020,7 +1020,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.timjarratt.scx;
 				PRODUCT_NAME = StreamCenter;
-				PROVISIONING_PROFILE = "ad014db7-8f20-4c1e-81a2-1cd0cd83fd3c";
+				PROVISIONING_PROFILE = "117ec930-3252-437c-b5e0-3b62922a9d93";
 			};
 			name = Release;
 		};
