@@ -10,7 +10,7 @@ import Foundation
 
 class TwitchChatView : UIView {
     let channel : TwitchChannel!
-    var chatMgr : TwitchChatManager? = nil
+    var chatMgr : TwitchChatManager?
     var shouldConsume = false
     var messageViews = [ChatMessageView]()
     
@@ -46,7 +46,6 @@ class TwitchChatView : UIView {
         self.shouldConsume = false
         self.chatMgr!.disconnect()
     }
-    
 }
 
 extension TwitchChatView : ChatManagerConsumer {

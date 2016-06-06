@@ -32,12 +32,7 @@ class TwitchGamesViewController : LoadingViewController {
     private var games = [TwitchGame]()
     private var twitchButton: UIButton?
     private var twitchAPIClient : TwitchApi = TwitchApiClient.init() // FIXME: should be injected
-    
-    convenience init(){
-        self.init(nibName: nil, bundle: nil)
-        title = "Twitch"
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
