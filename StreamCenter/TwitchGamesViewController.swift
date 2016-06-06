@@ -40,28 +40,16 @@ class TwitchGamesViewController : LoadingViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        
+
         configureViews()
     }
-    
-    /*
-    * viewWillAppear(animated: Bool)
-    *
-    * Overrides the super function to reload the collection view with fresh data
-    *
-    */
+
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
 
         loadContent()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     func loadContent() {
         self.removeErrorView()
         self.displayLoadingView("Loading Games...")
@@ -85,8 +73,6 @@ class TwitchGamesViewController : LoadingViewController {
     }
     
     func configureViews() {
-        
-        //then do the search bar
         self.searchField = UITextField(frame: CGRectZero)
         self.searchField.translatesAutoresizingMaskIntoConstraints = false
         self.searchField.placeholder = "Search Games or Streams"
