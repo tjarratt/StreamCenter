@@ -92,9 +92,7 @@ class TwitchGamesViewController : LoadingViewController {
         self.searchField.placeholder = "Search Games or Streams"
         self.searchField.delegate = self
         self.searchField.textAlignment = .Center
-        
-        
-        
+
         if TokenHelper.getTwitchToken() == nil {
             self.twitchButton = UIButton(type: .System)
             self.twitchButton?.translatesAutoresizingMaskIntoConstraints = false
@@ -107,7 +105,6 @@ class TwitchGamesViewController : LoadingViewController {
         imageView.contentMode = .ScaleAspectFit
         
         super.configureViews("Top Games", centerView: imageView, leftView: self.searchField, rightView: nil)
-        
     }
     
     func authorizeUser() {
