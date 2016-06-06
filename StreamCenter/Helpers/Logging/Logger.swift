@@ -13,7 +13,7 @@ struct Logger {
     static let dateFormatter = NSDateFormatter(format: "HH:mm:ss")
     static var level : LogLevel = .Info
     
-    static func Info<Object>(object : Object, _ file : String = __FILE__, _ function : String = __FUNCTION__, _ line : Int = __LINE__) {
+    static func Info<Object>(object : Object, _ file : String = #file, _ function : String = #function, _ line : Int = #line) {
         let level = LogLevel.Info
         
         if level >= self.level {
@@ -25,7 +25,7 @@ struct Logger {
         
     }
     
-    static func Debug<Object>(object : Object, _ file : String = __FILE__, _ function : String = __FUNCTION__, _ line : Int = __LINE__) {
+    static func Debug<Object>(object : Object, _ file : String = #file, _ function : String = #function, _ line : Int = #line) {
         let level = LogLevel.Debug
         
         if level >= self.level {
@@ -36,7 +36,7 @@ struct Logger {
         }
     }
     
-    static func Warning<Object>(object : Object, _ file : String = __FILE__, _ function : String = __FUNCTION__, _ line : Int = __LINE__) {
+    static func Warning<Object>(object : Object, _ file : String = #file, _ function : String = #function, _ line : Int = #line) {
         let level = LogLevel.Warning
         
         if level >= self.level {
@@ -47,7 +47,7 @@ struct Logger {
         }
     }
     
-    static func Error<Object>(object : Object, _ file : String = __FILE__, _ function : String = __FUNCTION__, _ line : Int = __LINE__) {
+    static func Error<Object>(object : Object, _ file : String = #file, _ function : String = #function, _ line : Int = #line) {
         let level = LogLevel.Error
         
         if level >= self.level {
@@ -58,7 +58,7 @@ struct Logger {
         }
     }
     
-    static func Severe<Object>(object : Object, _ file : String = __FILE__, _ function : String = __FUNCTION__, _ line : Int = __LINE__) {
+    static func Severe<Object>(object : Object, _ file : String = #file, _ function : String = #function, _ line : Int = #line) {
         let level = LogLevel.Severe
         
         if level >= self.level {
