@@ -248,8 +248,8 @@ class TwitchVideoViewController : UIViewController {
         leftSwipe.isEnabled = false
         
         //animate the showing of the chat view
-        UIView.animate(withDuration: 0.5,  animations:{ () -> Void in
-            self.chatView!.frame = CGRect(x: self.view.bounds.width - 400, y: 20, width: 380, height: self.view!.bounds.height - 40)
+        UIView.animate(withDuration: 0.5, animations: { () -> Void in
+            self.chatView!.frame = CGRect(x: self.view.bounds.width - 420, y: 20, width: 380, height: self.view!.bounds.height - 40)
             if let videoView = self.videoView, let frame = frame {
                 videoView.frame = frame
             }
