@@ -71,6 +71,9 @@
 		F7DB8C9E1D04EEA1004443EE /* TwitchApiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DB8C9D1D04EEA1004443EE /* TwitchApiClient.swift */; };
 		F7DB8CA11D04F02D004443EE /* FakeTwitchApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DB8CA01D04F025004443EE /* FakeTwitchApi.swift */; };
 		F7DB8CA41D04F76C004443EE /* AsyncMainQueueRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DB8CA31D04F76C004443EE /* AsyncMainQueueRunner.swift */; };
+		F7DB8CAA1D04FC37004443EE /* FakeAsyncMainQueueRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DB8CA91D04F9D1004443EE /* FakeAsyncMainQueueRunner.swift */; };
+		F7DB8CAD1D04FFE3004443EE /* UIKit_PivotalSpecHelperStubs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7DB8CAB1D04FFD6004443EE /* UIKit_PivotalSpecHelperStubs.framework */; };
+		F7DB8CAF1D050008004443EE /* UIKit_PivotalSpecHelperStubs.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = F7DB8CAB1D04FFD6004443EE /* UIKit_PivotalSpecHelperStubs.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -215,6 +218,16 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F7DB8CAE1D050000004443EE /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				F7DB8CAF1D050008004443EE /* UIKit_PivotalSpecHelperStubs.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -285,7 +298,8 @@
 		F7DB8C9D1D04EEA1004443EE /* TwitchApiClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchApiClient.swift; sourceTree = "<group>"; };
 		F7DB8CA01D04F025004443EE /* FakeTwitchApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeTwitchApi.swift; sourceTree = "<group>"; };
 		F7DB8CA31D04F76C004443EE /* AsyncMainQueueRunner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncMainQueueRunner.swift; sourceTree = "<group>"; };
-		F7DB8CA91D04F9D1004443EE /* FakeAyncMainQueueRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeAyncMainQueueRunner.swift; sourceTree = "<group>"; };
+		F7DB8CA91D04F9D1004443EE /* FakeAsyncMainQueueRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeAsyncMainQueueRunner.swift; sourceTree = "<group>"; };
+		F7DB8CAB1D04FFD6004443EE /* UIKit_PivotalSpecHelperStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit_PivotalSpecHelperStubs.framework; path = Carthage/Build/tvOS/UIKit_PivotalSpecHelperStubs.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -304,6 +318,7 @@
 			files = (
 				F7DB8C861D04E2D5004443EE /* Quick.framework in Frameworks */,
 				F7DB8C651D03B88D004443EE /* Nimble.framework in Frameworks */,
+				F7DB8CAD1D04FFE3004443EE /* UIKit_PivotalSpecHelperStubs.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -510,10 +525,11 @@
 		F7DB8C061D03AB07004443EE /* Externals */ = {
 			isa = PBXGroup;
 			children = (
-				F7DB8C661D04E2C1004443EE /* Quick.xcodeproj */,
-				F7DB8C3D1D03B85A004443EE /* Nimble.xcodeproj */,
 				F7DB8C071D03AB99004443EE /* Alamofire.framework */,
 				F7DB8C091D03AB99004443EE /* CocoaAsyncSocket.framework */,
+				F7DB8CAB1D04FFD6004443EE /* UIKit_PivotalSpecHelperStubs.framework */,
+				F7DB8C3D1D03B85A004443EE /* Nimble.xcodeproj */,
+				F7DB8C661D04E2C1004443EE /* Quick.xcodeproj */,
 			);
 			name = Externals;
 			sourceTree = "<group>";
@@ -576,7 +592,7 @@
 		F7DB8CA81D04F9D1004443EE /* fakes */ = {
 			isa = PBXGroup;
 			children = (
-				F7DB8CA91D04F9D1004443EE /* FakeAyncMainQueueRunner.swift */,
+				F7DB8CA91D04F9D1004443EE /* FakeAsyncMainQueueRunner.swift */,
 			);
 			path = fakes;
 			sourceTree = "<group>";
@@ -608,7 +624,7 @@
 			buildPhases = (
 				F7DB8C551D03B880004443EE /* Sources */,
 				F7DB8C561D03B880004443EE /* Frameworks */,
-				F7DB8C571D03B880004443EE /* Resources */,
+				F7DB8CAE1D050000004443EE /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -788,13 +804,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F7DB8C571D03B880004443EE /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -865,6 +874,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F7DB8CA11D04F02D004443EE /* FakeTwitchApi.swift in Sources */,
+				F7DB8CAA1D04FC37004443EE /* FakeAsyncMainQueueRunner.swift in Sources */,
 				F7DB8C5C1D03B880004443EE /* TwitchVideoViewControllerSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1019,6 +1029,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
 				INFOPLIST_FILE = Specs/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.glg.Specs;
@@ -1033,6 +1047,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
 				INFOPLIST_FILE = Specs/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.glg.Specs;

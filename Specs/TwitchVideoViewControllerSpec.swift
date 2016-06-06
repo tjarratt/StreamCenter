@@ -1,16 +1,20 @@
 import Quick
 import Nimble
+import UIKit_PivotalSpecHelperStubs
 @testable import StreamCenter
 
 class TwitchVideoViewControllerSpec: QuickSpec {
     override func spec() {
         describe("a view controller that presents twitch streams") {
             var subject : TwitchVideoViewController!
+            var fakeTwitchAPI : FakeTwitchApi!
+            var fakeAsyncMainQueueRunner : FakeAsyncMainQueueRunner!
+
             var twitchStream : TwitchStream!
             var twitchChannel : TwitchChannel!
-            var fakeTwitchAPI : FakeTwitchApi!
 
             beforeEach {
+                fakeAsyncMainQueueRunner = FakeAsyncMainQueueRunner.init()
                 fakeTwitchAPI = FakeTwitchApi.init()
                 twitchChannel = TwitchChannel.init(
                     id: 1,
@@ -33,7 +37,11 @@ class TwitchVideoViewControllerSpec: QuickSpec {
                     videoHeight: 60,
                     preview: ["key": "value"],
                     channel: twitchChannel)
-                subject = TwitchVideoViewController.init(stream: twitchStream, twitchClient:fakeTwitchAPI)
+                subject = TwitchVideoViewController.init(
+                    stream: twitchStream,
+                    twitchClient:fakeTwitchAPI,
+                    mainQueueRunner: fakeAsyncMainQueueRunner
+                )
             }
 
             context("when the view loads and appears") {
@@ -51,8 +59,10 @@ class TwitchVideoViewControllerSpec: QuickSpec {
                     expect(args.0).to(equal("MySpecialChannel"))
                 }
 
-                context("when the user presses the play/pause button") {
+                context("when the twitch video streams become available") {
                     beforeEach {
+                        fakeAsyncMainQueueRunner.runOnMainQueueStub = {(cb : () -> ()) in cb() }
+
                         let args = fakeTwitchAPI.getStreamsForChannelArgsForCall(0)
                         let cb = args.1
                         let twitchStreamVideo = TwitchStreamVideo.init(
@@ -63,17 +73,29 @@ class TwitchVideoViewControllerSpec: QuickSpec {
                         cb(streams: [twitchStreamVideo], error: nil)
                     }
 
-                    it("should dim the video view's opacity") {
-                        expect(subject.videoView?.alpha).to(equal(0.4));
+                    it("should initialize its views on the main queue") {
+                        expect(fakeAsyncMainQueueRunner.runOnMainQueueCallCount).to(equal(1))
+                        expect(subject.videoView).toNot(beNil())
                     }
 
-                    context("when the play/pause button is pressed again") {
-                        beforeEach {
 
+                    context("when the user presses the play/pause button") {
+                        beforeEach {
+                            subject.shortTap.recognize()
                         }
 
-                        it("should un-dim the video view") {
-                            expect(subject.videoView?.alpha).to(equal(1));
+                        it("should dim the video view's opacity") {
+                            expect(subject.videoView?.alpha).to(beCloseTo(0.4));
+                        }
+
+                        context("when the play/pause button is pressed again") {
+                            beforeEach {
+                                subject.shortTap.recognize()
+                            }
+
+                            it("should un-dim the video view") {
+                                expect(subject.videoView?.alpha).to(equal(1));
+                            }
                         }
                     }
                 }

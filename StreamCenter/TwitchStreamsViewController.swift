@@ -138,7 +138,11 @@ extension TwitchStreamsViewController {
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         let selectedStream = streams[indexPath.row]
-        let videoViewController = TwitchVideoViewController(stream: selectedStream, twitchClient: TwitchApiClient.init())
+        let videoViewController = TwitchVideoViewController(
+            stream: selectedStream,
+            twitchClient: TwitchApiClient.init(),
+            mainQueueRunner: AsyncMainQueueRunnerImpl.init()
+        )
         
         self.presentViewController(videoViewController, animated: true, completion: nil)
     }

@@ -24,13 +24,17 @@ class TwitchVideoViewController : UIViewController {
     internal var modalMenu : ModalMenuView?
     private var modalMenuOptions : [String : [MenuOption]]?
 
+    internal var leftSwipe : UISwipeGestureRecognizer!
+    internal var rightSwipe : UISwipeGestureRecognizer!
+    internal var shortTap : UITapGestureRecognizer!
+    internal var longTap : UILongPressGestureRecognizer!
+
     private var streams : [TwitchStreamVideo]?
     private var currentStream : TwitchStream?
     private var currentStreamVideo : TwitchStreamVideo?
-    private var leftSwipe : UISwipeGestureRecognizer!
-    private var rightSwipe : UISwipeGestureRecognizer!
 
     internal var twitchApiClient : TwitchApi!
+    internal var mainQueueRunner : AsyncMainQueueRunner!
     
     /*
     * init(stream : TwitchStream)
@@ -38,21 +42,22 @@ class TwitchVideoViewController : UIViewController {
     * Initializes the controller, it's gesture recognizer and modal menu.
     * Loads and prepare the video asset from the stream for display
     */
-    convenience init(stream : TwitchStream, twitchClient: TwitchApi) {
+    convenience init(stream : TwitchStream, twitchClient : TwitchApi, mainQueueRunner : AsyncMainQueueRunner) {
         self.init(nibName: nil, bundle: nil)
         self.currentStream = stream
         self.twitchApiClient = twitchClient
+        self.mainQueueRunner = mainQueueRunner
         
         self.view.backgroundColor = UIColor.blackColor()
         
         //Gestures configuration
-        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.handleLongPress(_:)))
-        longPressRecognizer.cancelsTouchesInView = true
-        self.view.addGestureRecognizer(longPressRecognizer)
+        longTap = UILongPressGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.handleLongPress(_:)))
+        longTap.cancelsTouchesInView = true
+        self.view.addGestureRecognizer(longTap)
         
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.pause))
-        tapRecognizer.allowedPressTypes = [NSNumber(integer: UIPressType.PlayPause.rawValue)]
-        self.view.addGestureRecognizer(tapRecognizer)
+        shortTap = UITapGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.pause))
+        shortTap.allowedPressTypes = [NSNumber(integer: UIPressType.PlayPause.rawValue)]
+        self.view.addGestureRecognizer(shortTap)
         
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.handleMenuPress))
         gestureRecognizer.allowedPressTypes = [UIPressType.Menu.rawValue]
@@ -92,7 +97,7 @@ class TwitchVideoViewController : UIViewController {
                 
                 self.videoPlayer = AVPlayer(playerItem: streamItem)
                 
-                dispatch_async(dispatch_get_main_queue(),{
+                self.mainQueueRunner.runOnMainQueue({ () -> () in
                     self.initializePlayerView()
                 })
             } else {
@@ -102,7 +107,7 @@ class TwitchVideoViewController : UIViewController {
                     self.dismissViewControllerAnimated(true, completion: nil)
                 }))
                 
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                self.mainQueueRunner.runOnMainQueue({ () -> () in
                     self.presentViewController(alert, animated: true, completion: nil)
                 })
             }
@@ -230,7 +235,7 @@ class TwitchVideoViewController : UIViewController {
     */
     func handleChatOnOff(sender : MenuItemView?) {
         //NOTE(Olivier) : 400 width reduction at 16:9 is 225 height reduction
-        dispatch_async(dispatch_get_main_queue(), {
+        self.mainQueueRunner.runOnMainQueue({ () -> () in
             if let menuItem = sender {
                 if menuItem.isOptionEnabled() {     //                      Turn chat off
                     
@@ -329,6 +334,7 @@ class TwitchVideoViewController : UIViewController {
     func pause() {
         if let player = self.videoPlayer {
             if player.rate == 1 {
+                videoView?.alpha = 0.40
                 player.pause()
             } else {
                 if let currentVideo = currentStreamVideo {
@@ -337,6 +343,7 @@ class TwitchVideoViewController : UIViewController {
                     let streamItem = AVPlayerItem(asset: streamAsset)
                     player.replaceCurrentItemWithPlayerItem(streamItem)
                 }
+                videoView?.alpha = 1.0
                 player.play()
             }
         }

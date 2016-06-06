@@ -210,7 +210,11 @@ extension TwitchSearchResultsViewController {
             self.presentViewController(streamViewController, animated: true, completion: nil)
         case .Stream:
             let selectedStream = streams[indexPath.row]
-            let videoViewController = TwitchVideoViewController(stream: selectedStream, twitchClient: TwitchApiClient.init())
+            let videoViewController = TwitchVideoViewController(
+                stream: selectedStream,
+                twitchClient: TwitchApiClient.init(),
+                mainQueueRunner: AsyncMainQueueRunnerImpl.init()
+            )
             
             self.presentViewController(videoViewController, animated: true, completion: nil)
         }
