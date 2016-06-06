@@ -13,8 +13,7 @@ class TwitchChatView : UIView {
     var chatMgr : TwitchChatManager?
     var shouldConsume = false
     var messageViews = [ChatMessageView]()
-    
-    
+
     init(frame: CGRect, channel: TwitchChannel) {
         self.channel = channel
         super.init(frame: frame)
