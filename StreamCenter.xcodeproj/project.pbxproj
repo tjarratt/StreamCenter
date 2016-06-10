@@ -59,6 +59,7 @@
 		B4D3103B1BD154320091448F /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4D3103A1BD154320091448F /* UIView.swift */; };
 		B4E75B1F1BD74E8F00C1E6BA /* ChatTopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E75B1E1BD74E8F00C1E6BA /* ChatTopView.swift */; };
 		B4E9F8001BCF83CC0026708F /* TwitchAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E9F7FF1BCF83CC0026708F /* TwitchAuthViewController.swift */; };
+		F7077D991D0A833100A63486 /* ModalMenuViewSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7077D981D0A833100A63486 /* ModalMenuViewSpec.swift */; };
 		F7DB8C0A1D03AB99004443EE /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7DB8C071D03AB99004443EE /* Alamofire.framework */; };
 		F7DB8C0C1D03AB99004443EE /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7DB8C091D03AB99004443EE /* CocoaAsyncSocket.framework */; };
 		F7DB8C0D1D03ABAD004443EE /* Alamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F7DB8C071D03AB99004443EE /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -284,6 +285,7 @@
 		B4D3103A1BD154320091448F /* UIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		B4E75B1E1BD74E8F00C1E6BA /* ChatTopView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatTopView.swift; sourceTree = "<group>"; };
 		B4E9F7FF1BCF83CC0026708F /* TwitchAuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwitchAuthViewController.swift; sourceTree = "<group>"; };
+		F7077D981D0A833100A63486 /* ModalMenuViewSpec.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModalMenuViewSpec.swift; sourceTree = "<group>"; };
 		F7DB8C071D03AB99004443EE /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/tvOS/Alamofire.framework; sourceTree = "<group>"; };
 		F7DB8C091D03AB99004443EE /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaAsyncSocket.framework; path = Carthage/Build/tvOS/CocoaAsyncSocket.framework; sourceTree = "<group>"; };
 		F7DB8C2F1D03AF16004443EE /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
@@ -547,8 +549,9 @@
 		F7DB8C5A1D03B880004443EE /* Specs */ = {
 			isa = PBXGroup;
 			children = (
-				F7DB8C5B1D03B880004443EE /* TwitchVideoViewControllerSpec.swift */,
 				F7DB8C5D1D03B880004443EE /* Info.plist */,
+				F7077D981D0A833100A63486 /* ModalMenuViewSpec.swift */,
+				F7DB8C5B1D03B880004443EE /* TwitchVideoViewControllerSpec.swift */,
 			);
 			path = Specs;
 			sourceTree = "<group>";
@@ -872,6 +875,7 @@
 				F7DB8CA11D04F02D004443EE /* FakeTwitchApi.swift in Sources */,
 				F7DB8CAA1D04FC37004443EE /* FakeAsyncMainQueueRunner.swift in Sources */,
 				F7DB8C5C1D03B880004443EE /* TwitchVideoViewControllerSpec.swift in Sources */,
+				F7077D991D0A833100A63486 /* ModalMenuViewSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
