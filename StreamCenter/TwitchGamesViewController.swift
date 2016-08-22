@@ -85,7 +85,7 @@ class TwitchGamesViewController : LoadingViewController {
         let imageView = UIImageView(image: UIImage(named: "twitch"))
         imageView.contentMode = .scaleAspectFit
         
-        super.configureViews("Top Games", centerView: imageView, leftView: self.searchField, rightView: nil)
+        super.configureViews("Top Games", centerView: imageView, leftView: self.searchField, rightView: self.twitchButton)
     }
     
     func authorizeUser() {
