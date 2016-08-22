@@ -210,7 +210,7 @@ struct TwitchApiClient : TwitchApi {
     ///     - completionHandler: A closure providing results and an error (both optionals) to be executed once the request completes
     func getStreamsWithSearchTerm(term : String, offset : Int, limit : Int, completionHandler: (streams: [TwitchStream]?, error: ServiceError?) -> ()) {
         //First we build the url according to the game we desire to get infos
-        let streamsUrlString = "https://api.twitch.tv/kraken/streams"
+        let streamsUrlString = "https://api.twitch.tv/kraken/search/streams"
 
         Alamofire.request(.GET, streamsUrlString, parameters :
             [   "limit"     : limit,
