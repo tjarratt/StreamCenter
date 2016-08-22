@@ -22,8 +22,6 @@
 		090AB9241BB36BC100CDB05D /* ChatMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090AB9231BB36BC100CDB05D /* ChatMessageView.swift */; };
 		090AB9271BB579A300CDB05D /* ModalMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090AB9261BB579A300CDB05D /* ModalMenuView.swift */; };
 		091277701BD461DF0003036D /* IRCMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0912776F1BD461DF0003036D /* IRCMessage.swift */; };
-		091277B21BE13E350003036D /* Mixpanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091277B11BE13E350003036D /* Mixpanel.swift */; };
-		091277B61BE150B90003036D /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091277B51BE150B90003036D /* Event.swift */; };
 		091277B91BE180820003036D /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091277B81BE180820003036D /* Logger.swift */; };
 		091277BB1BE187E10003036D /* NSDateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091277BA1BE187E10003036D /* NSDateFormatter.swift */; };
 		09199A1D1BBAC67F00B10543 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09199A1C1BBAC67F00B10543 /* LoadingViewController.swift */; };
@@ -252,8 +250,6 @@
 		090AB9231BB36BC100CDB05D /* ChatMessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatMessageView.swift; sourceTree = "<group>"; };
 		090AB9261BB579A300CDB05D /* ModalMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModalMenuView.swift; sourceTree = "<group>"; };
 		0912776F1BD461DF0003036D /* IRCMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IRCMessage.swift; sourceTree = "<group>"; };
-		091277B11BE13E350003036D /* Mixpanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mixpanel.swift; sourceTree = "<group>"; };
-		091277B51BE150B90003036D /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		091277B81BE180820003036D /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		091277BA1BE187E10003036D /* NSDateFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSDateFormatter.swift; sourceTree = "<group>"; };
 		09199A1C1BBAC67F00B10543 /* LoadingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
@@ -405,15 +401,6 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		091277B01BE13E270003036D /* Analytics */ = {
-			isa = PBXGroup;
-			children = (
-				091277B11BE13E350003036D /* Mixpanel.swift */,
-				091277B51BE150B90003036D /* Event.swift */,
-			);
-			path = Analytics;
-			sourceTree = "<group>";
-		};
 		091277B71BE180770003036D /* Logging */ = {
 			isa = PBXGroup;
 			children = (
@@ -455,7 +442,6 @@
 				09CE59891BAF5F870054EB71 /* Queue.swift */,
 				B4A2E6CE1BD01AEF0094AECA /* StreamCenterService.swift */,
 				B4D15C7F1BCDD3E3006FFB5D /* TokenHelper.swift */,
-				091277B01BE13E270003036D /* Analytics */,
 				F7DB8CA21D04F731004443EE /* Async */,
 				09199A1B1BBABC9100B10543 /* Extensions */,
 				09D6E7E51BD30E4100E88371 /* IRC */,
@@ -826,7 +812,6 @@
 				09D098291BA77FAB00E7E6FC /* TwitchVideoViewController.swift in Sources */,
 				090AB9271BB579A300CDB05D /* ModalMenuView.swift in Sources */,
 				B4A67BBC1BCBDF8B003E3B6F /* UIColor.swift in Sources */,
-				091277B61BE150B90003036D /* Event.swift in Sources */,
 				B4BDA2581BCD282C000DD1C8 /* ScrollingLabel.swift in Sources */,
 				091277701BD461DF0003036D /* IRCMessage.swift in Sources */,
 				090AB8FF1BA616A900CDB05D /* TwitchChannel.swift in Sources */,
@@ -862,7 +847,6 @@
 				09F106181BD6B2AA00DE0126 /* SwiftyJSON.swift in Sources */,
 				B4D15C801BCDD3E3006FFB5D /* TokenHelper.swift in Sources */,
 				09D6E7F31BD401E700E88371 /* ChatManagerConsumer.swift in Sources */,
-				091277B21BE13E350003036D /* Mixpanel.swift in Sources */,
 				09D6E7EF1BD3FD5100E88371 /* TwitchChatManager.swift in Sources */,
 				091277B91BE180820003036D /* Logger.swift in Sources */,
 				09D098251BA7666200E7E6FC /* TwitchStreamsViewController.swift in Sources */,
