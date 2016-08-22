@@ -167,8 +167,12 @@ extension TwitchGamesViewController : UITextFieldDelegate {
         guard let term = textField.text where !term.isEmpty else {
             return
         }
-        
-        let searchViewController = TwitchSearchResultsViewController(searchTerm: term)
+
+        let searchViewController = TwitchSearchResultsViewController(
+            searchTerm: term,
+            twitchClient: self.twitchAPIClient,
+            mainQueueRunner: AsyncMainQueueRunnerImpl()
+        )
         presentViewController(searchViewController, animated: true, completion: nil)
     }
 }

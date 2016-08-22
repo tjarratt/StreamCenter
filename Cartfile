@@ -2,3 +2,8 @@
 git "https://github.com/Alamofire/Alamofire.git"
 git "https://github.com/robbiehanson/CocoaAsyncSocket.git"
 
+# test dependencies
+#git "https://github.com/quick/quick.git"
+#git "https://github.com/quick/nimble.git"
+git "https://github.com/pivotal/pivotalcorekit.git" >= 0.3.4
+

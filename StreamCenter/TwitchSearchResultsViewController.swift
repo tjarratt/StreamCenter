@@ -1,11 +1,3 @@
-//
-//  TwitchSearchResultsViewController.swift
-//  GamingStreamsTVApp
-//
-//  Created by Brendan Kirchner on 10/12/15.
-//  Copyright © 2015 Rivus Media Inc. All rights reserved.
-//
-
 import UIKit
 
 private enum SearchType {
@@ -47,39 +39,29 @@ class TwitchSearchResultsViewController: LoadingViewController {
             }
         }
     }
-    
-    private var searchType = SearchType.Game
-    
-    private var searchTerm: String!
+
     private var games = [TwitchGame]()
     private var streams = [TwitchStream]()
+
+    internal var searchTypeControl: UISegmentedControl!
+    private var searchType = SearchType.Game
+
+    private var searchTerm: String!
+    private var twitchAPIClient : TwitchApi!
+    private var mainQueueRunner : AsyncMainQueueRunner!
     
-    private var searchTypeControl: UISegmentedControl!
-    private var twitchAPIClient : TwitchApi = TwitchApiClient.init() // FIXME: should be injected
-    
-    convenience init(searchTerm term: String) {
+    convenience init(searchTerm term: String, twitchClient : TwitchApi, mainQueueRunner : AsyncMainQueueRunner) {
         self.init(nibName: nil, bundle: nil)
         self.searchTerm = term
+        self.twitchAPIClient = twitchClient
+        self.mainQueueRunner = mainQueueRunner
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
         self.configureViews()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    /*
-    * viewWillAppear(animated: Bool)
-    *
-    * Overrides the super function to reload the collection view with fresh data
-    *
-    */
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -93,7 +75,7 @@ class TwitchSearchResultsViewController: LoadingViewController {
         self.displayLoadingView("Loading Results...")
         self.twitchAPIClient.getGamesWithSearchTerm(searchTerm, offset: 0, limit: LOADING_BUFFER) { (games, error) -> () in
             guard let games = games else {
-                dispatch_async(dispatch_get_main_queue(), {
+                self.mainQueueRunner.runOnMainQueue({
                     self.removeLoadingView()
                     self.displayErrorView("Error loading game list.\nPlease check your internet connection.")
                 })
@@ -101,15 +83,14 @@ class TwitchSearchResultsViewController: LoadingViewController {
             }
             
             self.games = games
-            dispatch_async(dispatch_get_main_queue(), {
-                
+            self.mainQueueRunner.runOnMainQueue({
                 self.removeLoadingView()
                 self.collectionView.reloadData()
             })
         }
         self.twitchAPIClient.getStreamsWithSearchTerm(searchTerm, offset: 0, limit: LOADING_BUFFER) { (streams, error) -> () in
             guard let streams = streams else {
-                dispatch_async(dispatch_get_main_queue(), {
+                self.mainQueueRunner.runOnMainQueue({
                     self.removeLoadingView()
                     self.displayErrorView("Error loading game list.\nPlease check your internet connection.")
                 })
@@ -117,8 +98,7 @@ class TwitchSearchResultsViewController: LoadingViewController {
             }
             
             self.streams = streams
-            dispatch_async(dispatch_get_main_queue(), {
-                
+            self.mainQueueRunner.runOnMainQueue({
                 self.removeLoadingView()
                 self.collectionView.reloadData()
             })
@@ -126,13 +106,15 @@ class TwitchSearchResultsViewController: LoadingViewController {
     }
     
     private func configureViews() {
-        
-        //then do the search bar
         self.searchTypeControl = UISegmentedControl(items: ["Games", "Streams"])
         self.searchTypeControl.translatesAutoresizingMaskIntoConstraints = false
         self.searchTypeControl.selectedSegmentIndex = 0
         self.searchTypeControl.setTitleTextAttributes([NSForegroundColorAttributeName : UIColor(white: 0.45, alpha: 1)], forState: .Normal)
-        self.searchTypeControl.addTarget(self, action: #selector(TwitchSearchResultsViewController.changedSearchType(_:)), forControlEvents: .ValueChanged)
+        self.searchTypeControl.addTarget(
+            self,
+            action: #selector(TwitchSearchResultsViewController.changedSearchType(_:forEvent:)),
+            forControlEvents: .ValueChanged
+        )
         
         super.configureViews("Search Results - \(searchTerm)", centerView: nil, leftView: self.searchTypeControl, rightView: nil)
     }
@@ -142,7 +124,7 @@ class TwitchSearchResultsViewController: LoadingViewController {
         super.reloadContent()
     }
     
-    func changedSearchType(control: UISegmentedControl) {
+    func changedSearchType(control: UISegmentedControl, forEvent: UIEvent) {
         switch control.selectedSegmentIndex {
         case 0:
             searchType = .Game
@@ -186,12 +168,22 @@ class TwitchSearchResultsViewController: LoadingViewController {
     
     override var itemCount: Int {
         get {
-            return games.count
+            switch searchType {
+            case .Game:
+                return games.count
+            case .Stream:
+                return streams.count
+            }
         }
     }
-    
+
     override func getItemAtIndex(index: Int) -> CellItem {
-        return games[index]
+        switch searchType {
+        case .Game:
+            return games[index]
+        case .Stream:
+            return streams[index]
+        }
     }
 
 }

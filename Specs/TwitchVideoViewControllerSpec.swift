@@ -78,7 +78,6 @@ class TwitchVideoViewControllerSpec: QuickSpec {
                         expect(subject.videoView).toNot(beNil())
                     }
 
-
                     context("when the user presses the play/pause button") {
                         beforeEach {
                             subject.shortTap.recognize()

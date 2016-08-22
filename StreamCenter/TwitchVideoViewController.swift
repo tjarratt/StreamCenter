@@ -1,10 +1,3 @@
-//
-//  TwitchVideoViewController.swift
-//  GamingStreamsTVApp
-//
-//  Created by Olivier Boucher on 2015-09-14.
-//  Copyright © 2015 Rivus Media Inc. All rights reserved.
-//
 import AVKit
 import UIKit
 import Foundation
@@ -36,12 +29,6 @@ class TwitchVideoViewController : UIViewController {
     internal var twitchApiClient : TwitchApi!
     internal var mainQueueRunner : AsyncMainQueueRunner!
     
-    /*
-    * init(stream : TwitchStream)
-    *
-    * Initializes the controller, it's gesture recognizer and modal menu.
-    * Loads and prepare the video asset from the stream for display
-    */
     convenience init(stream : TwitchStream, twitchClient : TwitchApi, mainQueueRunner : AsyncMainQueueRunner) {
         self.init(nibName: nil, bundle: nil)
         self.currentStream = stream
