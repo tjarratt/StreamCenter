@@ -11,7 +11,7 @@ import Foundation
 struct Logger {
     
     static let dateFormatter = NSDateFormatter(format: "HH:mm:ss")
-    static var level : LogLevel = .Info
+    static var level : LogLevel = .Error
     
     static func Info<Object>(object : Object, _ file : String = #file, _ function : String = #function, _ line : Int = #line) {
         let level = LogLevel.Info
