@@ -44,5 +44,7 @@
 	<array>
 		<string>arm64</string>
 	</array>
+	<key>SECRET_CLIENT_ID</key>
+	<string>$(SECRET_CLIENT_ID)</string>
 </dict>
 </plist>
