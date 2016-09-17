@@ -8,7 +8,7 @@ import UIKit
 import Foundation
 
 class TwitchStreamsViewController: LoadingViewController {
-    private let LOADING_BUFFER = 12
+    fileprivate let LOADING_BUFFER = 12
     
     override var NUM_COLUMNS: Int {
         get {
@@ -28,9 +28,9 @@ class TwitchStreamsViewController: LoadingViewController {
         }
     }
     
-    private var game : TwitchGame!
-    private var streams = [TwitchStream]()
-    private var twitchAPIClient : TwitchApi = TwitchApiClient.init() // FIXME: should be injected
+    fileprivate var game : TwitchGame!
+    fileprivate var streams = [TwitchStream]()
+    fileprivate var twitchAPIClient : TwitchApi = TwitchApiClient.init() // FIXME: should be injected
     
     convenience init(game : TwitchGame){
         self.init(nibName: nil, bundle: nil)
@@ -48,7 +48,7 @@ class TwitchStreamsViewController: LoadingViewController {
     * Overrides the super function to reload the collection view with fresh data
     * 
     */
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         loadContent()
@@ -65,7 +65,7 @@ class TwitchStreamsViewController: LoadingViewController {
             (streams, error) in
             
             guard let streams = streams else {
-                dispatch_async(dispatch_get_main_queue(), {
+                DispatchQueue.main.async(execute: {
                     self.removeLoadingView()
                     self.displayErrorView("Error loading streams list.\nPlease check your internet connection.")
                 })
@@ -73,14 +73,14 @@ class TwitchStreamsViewController: LoadingViewController {
             }
             
             self.streams = streams
-            dispatch_async(dispatch_get_main_queue(), {
+            DispatchQueue.main.async(execute: {
                 self.removeLoadingView()
                 self.collectionView.reloadData()
             })
         }
     }
     
-    private func configureViews() {
+    fileprivate func configureViews() {
         super.configureViews("Live Streams - \(self.game!.name)", centerView: nil, leftView: nil, rightView: nil)
     }
     
@@ -96,24 +96,24 @@ class TwitchStreamsViewController: LoadingViewController {
             guard let streams = streams else {
                 return
             }
-            var paths = [NSIndexPath]()
+            var paths = [IndexPath]()
             
             let filteredStreams = streams.filter({
                 let streamId = $0.id
-                if let _ = self.streams.indexOf({$0.id == streamId}) {
+                if let _ = self.streams.index(where: {$0.id == streamId}) {
                     return false
                 }
                 return true
             })
             
             for i in 0..<filteredStreams.count {
-                paths.append(NSIndexPath(forItem: i + self.streams.count, inSection: 0))
+                paths.append(IndexPath(item: i + self.streams.count, section: 0))
             }
             
             self.collectionView.performBatchUpdates({
-                self.streams.appendContentsOf(filteredStreams)
+                self.streams.append(contentsOf: filteredStreams)
                 
-                self.collectionView.insertItemsAtIndexPaths(paths)
+                self.collectionView.insertItems(at: paths)
                 
                 }, completion: nil)
         }
@@ -125,7 +125,7 @@ class TwitchStreamsViewController: LoadingViewController {
         }
     }
     
-    override func getItemAtIndex(index: Int) -> CellItem {
+    override func getItemAtIndex(_ index: Int) -> CellItem {
         return streams[index]
     }
 }
@@ -136,15 +136,15 @@ class TwitchStreamsViewController: LoadingViewController {
 
 extension TwitchStreamsViewController {
     
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        let selectedStream = streams[indexPath.row]
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: IndexPath) {
+        let selectedStream = streams[(indexPath as NSIndexPath).row]
         let videoViewController = TwitchVideoViewController(
             stream: selectedStream,
             twitchClient: TwitchApiClient.init(),
             mainQueueRunner: AsyncMainQueueRunnerImpl.init()
         )
         
-        self.presentViewController(videoViewController, animated: true, completion: nil)
+        self.present(videoViewController, animated: true, completion: nil)
     }
     
 }

@@ -9,22 +9,22 @@ import Foundation
 
 class LoadingView : UIView {
     
-    private var label : UILabel!
-    private var activityIndicator : UIActivityIndicatorView!
+    fileprivate var label : UILabel!
+    fileprivate var activityIndicator : UIActivityIndicatorView!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         let labelBounds = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: self.bounds.width, height: self.bounds.height * 0.3))
         self.label = UILabel(frame: labelBounds)
-        self.label.font = UIFont.systemFontOfSize(45)
+        self.label.font = UIFont.systemFont(ofSize: 45)
         self.label.text = "Loading..."
-        self.label.textColor = UIColor.whiteColor()
-        self.label.textAlignment = NSTextAlignment.Center
+        self.label.textColor = UIColor.white
+        self.label.textAlignment = NSTextAlignment.center
         
         let indicatorBounds = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: self.bounds.width, height: self.bounds.height * 0.7))
         self.activityIndicator = UIActivityIndicatorView(frame: indicatorBounds)
-        self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge
+        self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.whiteLarge
         self.activityIndicator.sizeToFit()
         self.activityIndicator.startAnimating()
         

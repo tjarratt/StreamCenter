@@ -2,12 +2,13 @@ import Foundation
 import Alamofire
 
 struct TwitchApiClient : TwitchApi {
-    func getStreamsForChannel(channel : String, completionHandler: (streams: [TwitchStreamVideo]?, error: ServiceError?) -> ()){
-        //First we build the url according to the channel we desire to get stream link
+    func getStreamsForChannel(_ channel : String,
+                       completionHandler: @escaping StreamVideoCompletionHandler) {
         let accessUrlString = String(format: "https://api.twitch.tv/api/channels/%@/access_token", channel)
 
-        Alamofire.request(.GET, accessUrlString, parameters: [:], encoding: .URL, headers: headers())
-            .responseJSON { response in
+        Alamofire.request(accessUrlString,
+                          encoding: URLEncoding.default,
+                          headers: headers()).responseJSON { response in
 
                 if response.result.isSuccess {
                     if let accessInfoDict = response.result.value as? [String : AnyObject] {
@@ -15,30 +16,31 @@ struct TwitchApiClient : TwitchApi {
                             if let token = accessInfoDict["token"] as? String {
                                 let playlistUrlString  = String(format : "http://usher.twitch.tv/api/channel/hls/%@.m3u8", channel)
 
-                                Alamofire.request(.GET, playlistUrlString, parameters :
-                                    [   "player"            : "twitchweb",
-                                        "allow_audio_only"  : "true",
-                                        "allow_source"      : "true",
-                                        "type"              : "any",
-                                        "p"                 : Int(arc4random_uniform(99999)),
-                                        "token"             : token,
-                                        "sig"               : sig])
-                                    .responseString { response in
+                                let parameters = ["player"            : "twitchweb",
+                                                  "allow_audio_only"  : "true",
+                                                  "allow_source"      : "true",
+                                                  "type"              : "any",
+                                                  "p"                 : Int(arc4random_uniform(99999)),
+                                                  "token"             : token,
+                                                  "sig"               : sig] as [String : Any]
+                                Alamofire.request(playlistUrlString,
+                                                  parameters : parameters,
+                                                  headers: self.headers()).responseString { response in
                                         if response.result.isSuccess {
                                             guard let _ = response.result.value else {
                                                 Logger.Error("Response had no value")
-                                                completionHandler(streams: nil, error: .DataError)
+                                                completionHandler(nil, .dataError)
                                                 return
                                             }
                                             if let streams = M3UParser.parseToDict(response.result.value!) {
                                                 Logger.Debug("Returned \(streams.count) results")
-                                                completionHandler(streams: streams, error: nil)
+                                                completionHandler(streams, nil)
                                                 return
                                             }
                                             else {
                                                 //Error parsing the .m3u8
                                                 Logger.Error("Could not parse the .m3u8 file")
-                                                completionHandler(streams: nil, error: .OtherError("Parser error"))
+                                                completionHandler(nil, .otherError("Parser error"))
                                                 return
                                             }
 
@@ -46,7 +48,7 @@ struct TwitchApiClient : TwitchApi {
                                         else {
                                             //Error retrieving the .m3u8
                                             Logger.Error("Could not get the .m3u8 file")
-                                            completionHandler(streams: nil, error: .URLError)
+                                            completionHandler(nil, .urlError)
                                             return
                                         }
                                 }
@@ -56,14 +58,14 @@ struct TwitchApiClient : TwitchApi {
                     }
                     //Error with the access token json response
                     Logger.Error("Could not parse the access token response as JSON")
-                    completionHandler(streams: nil, error: .JSONError)
+                    completionHandler(nil, .jsonError)
                     return
 
                 }
                 else {
                     //Error with access token request
                     Logger.Error("Could not request the access token")
-                    completionHandler(streams: nil, error: .URLError)
+                    completionHandler(nil, .urlError)
                     return
 
                 }
@@ -77,16 +79,16 @@ struct TwitchApiClient : TwitchApi {
     ///     - offset: An integer offset to load content after the primary results (useful when you reach the end of a scrolling list)
     ///     - limit: The number of games to return
     ///     - completionHandler: A closure providing results and an error (both optionals) to be executed once the request completes
-    func getTopGamesWithOffset(offset : Int, limit : Int, completionHandler: (games: [TwitchGame]?, error: ServiceError?) -> ()) {
+    func getTopGamesWithOffset(_ offset : Int, limit : Int, completionHandler: @escaping TwitchGameCompletionHandler) {
         //First we build the url according to the game we desire to get infos
         let gamesUrlString = "https://api.twitch.tv/kraken/games/top"
-        let parameters: [String: AnyObject] = ["limit"   : limit,
-                                               "offset"  : offset]
+        let parameters: [String: AnyObject] = ["limit"   : limit as AnyObject,
+                                               "offset"  : offset as AnyObject]
 
-        Alamofire.request(.GET, gamesUrlString,
-            parameters: parameters,
-            encoding: .URL,
-            headers: headers()).responseJSON { response in
+        Alamofire.request(gamesUrlString,
+                          parameters: parameters,
+                          encoding: URLEncoding.default,
+                          headers: headers()).responseJSON { response in
                 if response.result.isSuccess {
                     if let gamesInfoDict = response.result.value as? [String : AnyObject] {
                         if let gamesDicts = gamesInfoDict["top"] as? [[String : AnyObject]] {
@@ -97,17 +99,17 @@ struct TwitchApiClient : TwitchApi {
                                 }
                             }
                             Logger.Debug("Returned \(games.count) results")
-                            completionHandler(games: games, error: nil)
+                            completionHandler(games, nil)
                             return
                         }
                     }
                     Logger.Error("Could not parse response as JSON")
-                    completionHandler(games: nil, error: .JSONError)
+                    completionHandler(nil, .jsonError)
                     return
                 }
                 else {
                     Logger.Error("Could not request top games")
-                    completionHandler(games: nil, error: .URLError)
+                    completionHandler(nil, .urlError)
                     return
                 }
         }
@@ -120,42 +122,41 @@ struct TwitchApiClient : TwitchApi {
     ///     - offset: An integer offset to load content after the primary results (useful when you reach the end of a scrolling list)
     ///     - limit: The number of streams to return
     ///     - completionHandler: A closure providing results and an error (both optionals) to be executed once the request completes
-    func getTopStreamsForGameWithOffset(game : String, offset : Int, limit : Int, completionHandler: (streams: [TwitchStream]?, error: ServiceError?) -> ()) {
+    func getTopStreamsForGameWithOffset(_ game : String, offset : Int, limit : Int, completionHandler: @escaping TwitchStreamCompletionHandler) {
         //First we build the url according to the game we desire to get infos
         let streamsUrlString = "https://api.twitch.tv/kraken/streams"
-        let parameters: [String: AnyObject] = ["limit"      : limit,
-                                               "offset"     : offset,
-                                               "game"       : game,
-                                               "stream_type": "live"]
+        let parameters: [String: AnyObject] = ["limit"      : limit as AnyObject,
+                                               "offset"     : offset as AnyObject,
+                                               "game"       : game as AnyObject,
+                                               "stream_type": "live" as AnyObject]
 
-        Alamofire.request(.GET, streamsUrlString,
-            parameters: parameters,
-            encoding: .URL,
-            headers: headers()).responseJSON { response in
-
+        Alamofire.request(streamsUrlString,
+                          parameters: parameters,
+                          encoding: URLEncoding.default,
+                          headers: headers()).responseJSON { response in
                 if response.result.isSuccess {
                     if let streamsInfoDict = response.result.value as? [String : AnyObject] {
                         if let streamsDicts = streamsInfoDict["streams"] as? [[String : AnyObject]] {
                             var streams = [TwitchStream]()
                             for streamRaw in streamsDicts {
                                 if let channelDict = streamRaw["channel"] as? [String : AnyObject] {
-                                    if let channel = TwitchChannel(dict: channelDict), stream = TwitchStream(dict: streamRaw, channel: channel) {
+                                    if let channel = TwitchChannel(dict: channelDict), let stream = TwitchStream(dict: streamRaw, channel: channel) {
                                         streams.append(stream)
                                     }
                                 }
                             }
                             Logger.Debug("Returned \(streams.count) results")
-                            completionHandler(streams: streams, error: nil)
+                            completionHandler(streams, nil)
                             return
                         }
                     }
                     Logger.Error("Could not parse response as JSON")
-                    completionHandler(streams: nil, error: .JSONError)
+                    completionHandler(nil, .jsonError)
                     return
                 }
                 else {
                     Logger.Error("Could not request top streams")
-                    completionHandler(streams: nil, error: .URLError)
+                    completionHandler(nil, .urlError)
                     return
                 }
         }
@@ -168,16 +169,17 @@ struct TwitchApiClient : TwitchApi {
     ///     - offset: An integer offset to load content after the primary results (useful when you reach the end of a scrolling list)
     ///     - limit: The number of games to return
     ///     - completionHandler: A closure providing results and an error (both optionals) to be executed once the request completes
-    func getGamesWithSearchTerm(term: String, offset : Int, limit : Int, completionHandler: (games: [TwitchGame]?, error: ServiceError?) -> ()) {
+    func getGamesWithSearchTerm(_ term: String, offset : Int, limit : Int, completionHandler: @escaping TwitchGameCompletionHandler) {
         //First we build the url according to the game we desire to get infos
         let searchUrlString = "https://api.twitch.tv/kraken/search/games"
-        let parameters: [String: AnyObject] = ["query"     : term,
-                                               "type"      : "suggest",
-                                               "live"      : true]
-            Alamofire.request(.GET, searchUrlString,
-                parameters: parameters,
-                encoding: .URL,
-                headers: headers()).responseJSON { response in
+        let parameters: [String: AnyObject] = ["query"     : term as AnyObject,
+                                               "type"      : "suggest" as AnyObject,
+                                               "live"      : true as AnyObject]
+
+        Alamofire.request(searchUrlString,
+                          parameters: parameters,
+                          encoding: URLEncoding.default,
+                          headers: headers()).responseJSON { response in
                 if response.result.isSuccess {
                     if let gamesInfoDict = response.result.value as? [String : AnyObject] {
                         if let gamesDicts = gamesInfoDict["games"] as? [[String : AnyObject]] {
@@ -188,17 +190,17 @@ struct TwitchApiClient : TwitchApi {
                                 }
                             }
                             Logger.Debug("Returned \(games.count) results")
-                            completionHandler(games: games, error: nil)
+                            completionHandler(games, nil)
                             return
                         }
                     }
                     Logger.Error("Could not parse response as JSON")
-                    completionHandler(games: nil, error: .JSONError)
+                    completionHandler(nil, .jsonError)
                     return
                 }
                 else {
                     Logger.Error("Could not request games with search term")
-                    completionHandler(games: nil, error: .URLError)
+                    completionHandler(nil, .urlError)
                     return
                 }
         }
@@ -211,42 +213,42 @@ struct TwitchApiClient : TwitchApi {
     ///     - offset: An integer offset to load content after the primary results (useful when you reach the end of a scrolling list)
     ///     - limit: The number of streams to return
     ///     - completionHandler: A closure providing results and an error (both optionals) to be executed once the request completes
-    func getStreamsWithSearchTerm(term : String, offset : Int, limit : Int, completionHandler: (streams: [TwitchStream]?, error: ServiceError?) -> ()) {
+    func getStreamsWithSearchTerm(_ term : String, offset : Int, limit : Int, completionHandler: @escaping TwitchStreamCompletionHandler) {
         //First we build the url according to the game we desire to get infos
         let streamsUrlString = "https://api.twitch.tv/kraken/search/streams"
-        let parameters: [String: AnyObject] = ["limit"     : limit,
-                                               "offset"    : offset,
-                                               "query"     : term]
+        let parameters: [String: AnyObject] = ["limit"     : limit as AnyObject,
+                                               "offset"    : offset as AnyObject,
+                                               "query"     : term as AnyObject]
 
-        Alamofire.request(.GET, streamsUrlString,
-            parameters: parameters,
-            encoding: .URL,
-            headers: headers()).responseJSON { response in
-                if response.result.isSuccess {
-                    if let streamsInfoDict = response.result.value as? [String : AnyObject] {
-                        if let streamsDicts = streamsInfoDict["streams"] as? [[String : AnyObject]] {
-                            var streams = [TwitchStream]()
-                            for streamDict in streamsDicts {
-                                if let channelDict = streamDict["channel"] as? [String : AnyObject] {
-                                    if let channel = TwitchChannel(dict: channelDict), stream = TwitchStream(dict: streamDict, channel: channel) {
-                                        streams.append(stream)
-                                    }
+        Alamofire.request(streamsUrlString,
+                          parameters: parameters,
+                          encoding: URLEncoding.default,
+                          headers: headers()).responseJSON { response in
+            if response.result.isSuccess {
+                if let streamsInfoDict = response.result.value as? [String : AnyObject] {
+                    if let streamsDicts = streamsInfoDict["streams"] as? [[String : AnyObject]] {
+                        var streams = [TwitchStream]()
+                        for streamDict in streamsDicts {
+                            if let channelDict = streamDict["channel"] as? [String : AnyObject] {
+                                if let channel = TwitchChannel(dict: channelDict), let stream = TwitchStream(dict: streamDict, channel: channel) {
+                                    streams.append(stream)
                                 }
                             }
-                            Logger.Debug("Returned \(streams.count) results")
-                            completionHandler(streams: streams, error: nil)
-                            return
                         }
+                        Logger.Debug("Returned \(streams.count) results")
+                        completionHandler(streams, nil)
+                        return
                     }
-                    Logger.Error("Could not parse response as JSON")
-                    completionHandler(streams: nil, error: .JSONError)
-                    return
                 }
-                else {
-                    Logger.Error("Could not request streams with search term")
-                    completionHandler(streams: nil, error: .URLError)
-                    return
-                }
+                Logger.Error("Could not parse response as JSON")
+                completionHandler(nil, .jsonError)
+                return
+            }
+            else {
+                Logger.Error("Could not request streams with search term")
+                completionHandler(nil, .urlError)
+                return
+            }
         }
     }
 
@@ -257,59 +259,58 @@ struct TwitchApiClient : TwitchApi {
     ///     - offset: An integer offset to load content after the primary results (useful when you reach the end of a scrolling list)
     ///     - limit: The number of games to return
     ///     - completionHandler: A closure providing results and an error (both optionals) to be executed once the request completes
-    func getStreamsThatUserIsFollowing(offset : Int, limit : Int, completionHandler: (streams: [TwitchStream]?, error: ServiceError?) -> ()) {
+    func getStreamsThatUserIsFollowing(_ offset : Int, limit : Int, completionHandler: @escaping TwitchStreamCompletionHandler) {
 
         guard let token = TokenHelper.getTwitchToken() else {
-            completionHandler(streams: nil, error: .AuthError)
+            completionHandler(nil, .authError)
             return
         }
         //First we build the url according to the game we desire to get infos
         let streamsUrlString = "https://api.twitch.tv/kraken/streams/followed"
-        let parameters: [String: AnyObject] = ["limit"         : limit,
-                                               "offset"        : offset,
-                                               "oauth_token"   : token]
+        let parameters: [String: AnyObject] = ["limit"         : limit as AnyObject,
+                                               "offset"        : offset as AnyObject,
+                                               "oauth_token"   : token as AnyObject]
 
-        Alamofire.request(.GET, streamsUrlString,
-            parameters: parameters,
-            encoding: .URL,
-            headers: headers()).responseJSON { response in
-
-                if response.result.isSuccess {
-                    if let streamsInfoDict = response.result.value as? [String : AnyObject] {
-                        if let streamsDicts = streamsInfoDict["streams"] as? [[String : AnyObject]] {
-                            var streams = [TwitchStream]()
-                            for streamDict in streamsDicts {
-                                if let channelDict = streamDict["channel"] as? [String : AnyObject] {
-                                    if let channel = TwitchChannel(dict: channelDict), stream = TwitchStream(dict: streamDict, channel: channel) {
-                                        streams.append(stream)
-                                    }
+        Alamofire.request(streamsUrlString,
+                          parameters: parameters,
+                          encoding: URLEncoding.default,
+                          headers: headers()).responseJSON { response in
+            if response.result.isSuccess {
+                if let streamsInfoDict = response.result.value as? [String : AnyObject] {
+                    if let streamsDicts = streamsInfoDict["streams"] as? [[String : AnyObject]] {
+                        var streams = [TwitchStream]()
+                        for streamDict in streamsDicts {
+                            if let channelDict = streamDict["channel"] as? [String : AnyObject] {
+                                if let channel = TwitchChannel(dict: channelDict), let stream = TwitchStream(dict: streamDict, channel: channel) {
+                                    streams.append(stream)
                                 }
                             }
-                            Logger.Debug("Returned \(streams.count) results")
-                            completionHandler(streams: streams, error: nil)
-                            return
                         }
+                        Logger.Debug("Returned \(streams.count) results")
+                        completionHandler(streams, nil)
+                        return
                     }
-                    Logger.Error("Could not parse response as JSON")
-                    completionHandler(streams: nil, error: .JSONError)
-                    return
                 }
-                else {
-                    Logger.Error("Could not request followed streams by user")
-                    completionHandler(streams: nil, error: .URLError)
-                    return
-                }
+                Logger.Error("Could not parse response as JSON")
+                completionHandler(nil, .jsonError)
+                return
+            }
+            else {
+                Logger.Error("Could not request followed streams by user")
+                completionHandler(nil, .urlError)
+                return
+            }
         }
     }
 
-    func getEmoteUrlStringFromId(id : String) -> String {
+    func getEmoteUrlStringFromId(_ id : String) -> String {
         return  "http://static-cdn.jtvnw.net/emoticons/v1/\(id)/1.0"
     }
 
-    private func headers() -> [String: String] {
-        let dictionary = NSBundle.mainBundle().infoDictionary
+    fileprivate func headers() -> [String: String] {
+        let dictionary = Bundle.main.infoDictionary
         let rawClientId = dictionary!["SECRET_CLIENT_ID"] as! String
-        let clientId = rawClientId.stringByReplacingOccurrencesOfString("\\", withString: "")
+        let clientId = rawClientId.replacingOccurrences(of: "\\", with: "")
 
         return ["Client-ID": clientId]
     }

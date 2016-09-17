@@ -7,14 +7,18 @@
 import Foundation
 
 struct ConcurrencyHelpers {
-    static func createDispatchTimer(interval: UInt64, leeway: UInt64, queue: dispatch_queue_t, block: dispatch_block_t) -> dispatch_source_t
-    {
-        let timer : dispatch_source_t = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue)
-        
-        dispatch_source_set_timer(timer, dispatch_walltime(nil, 0), interval, leeway)
-        dispatch_source_set_event_handler(timer, block)
-        dispatch_resume(timer)
-        
+    static func createDispatchTimer(queue: DispatchQueue,
+                                    block: @escaping ()->()) -> DispatchSourceTimer {
+        let flags = DispatchSource.TimerFlags(rawValue: UInt(0))
+        let timer = DispatchSource.makeTimerSource(flags: flags, queue: queue)
+
+        timer.scheduleRepeating(deadline: DispatchTime.now(),
+                                interval: .milliseconds(500) as DispatchTimeInterval,
+                                leeway: .milliseconds(500) as DispatchTimeInterval)
+
+        timer.setEventHandler { block() }
+
+        timer.resume()
         return timer
     }
 }

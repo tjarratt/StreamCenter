@@ -9,5 +9,5 @@
 import Foundation
 
 protocol ChatManagerConsumer {
-    func messageReadyForDisplay(message: NSAttributedString)
+    func messageReadyForDisplay(_ message: NSAttributedString)
 }

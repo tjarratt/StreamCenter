@@ -8,57 +8,86 @@
 
 import Foundation
 import CocoaAsyncSocket
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
+fileprivate func <= <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l <= r
+  default:
+    return !(rhs < lhs)
+  }
+}
+
 
 
 class IRCConnection {
     
-    typealias CommandHandlerFunc = ((message : IRCMessage) -> ())
+    typealias CommandHandlerFunc = ((_ message : IRCMessage) -> ())
     
     enum ChatConnectionStatus {
-        case Disconnected
-        case ServerDisconnected
-        case Connecting
-        case Connected
-        case Suspended
+        case disconnected
+        case serverDisconnected
+        case connecting
+        case connected
+        case suspended
     }
     
     //Constants
-    private let PING_SERVER_INTERVAL : Double = 120
-    private let QUEUE_WAIT_BEFORE_CONNECTED : Double = 120
-    private let MAXIMUM_COMMAND_LENGHT : Int = 510
-    private let END_CAPABILITY_TIMEOUT_DELAY : Double = 45
+    fileprivate let PING_SERVER_INTERVAL : Double = 120
+    fileprivate let QUEUE_WAIT_BEFORE_CONNECTED : Double = 120
+    fileprivate let MAXIMUM_COMMAND_LENGTH : Int = 510
+    fileprivate let END_CAPABILITY_TIMEOUT_DELAY : Double = 45
     
     //GCD
-    private var chatConnection : GCDAsyncSocket?
-    private var connectionQueue : dispatch_queue_t
-    private let sendQueueLock : dispatch_semaphore_t
+    fileprivate var chatConnection : GCDAsyncSocket?
+    fileprivate var connectionQueue : DispatchQueue
+    fileprivate let sendQueueLock : DispatchSemaphore
     
     //Send queue
-    private var sendQueue : [NSData]
-    private var sendQueueProcessing : Bool = false
-    private var queueWait : NSDate?
+    fileprivate var sendQueue : [Data]
+    fileprivate var sendQueueProcessing : Bool = false
+    fileprivate var queueWait : Date?
     
     //Connection state
-    private var status : ChatConnectionStatus
-    private var connectedDate : NSDate?
-    private var lastConnectAttempt : NSDate?
-    private var lastCommand : NSDate?
-    private var lastError : NSError?
+    fileprivate var status : ChatConnectionStatus
+    fileprivate var connectedDate : Date?
+    fileprivate var lastConnectAttempt : Date?
+    fileprivate var lastCommand : Date?
+    fileprivate var lastError : Error?
     
     //Capability request state
-    private var capabilities : IRCCapabilities?
-    private var sendEndCapabilityCommandAtTime : NSDate?
-    private var sentEndCapabilityCommand : Bool = false
+    fileprivate var capabilities : IRCCapabilities?
+    fileprivate var sendEndCapabilityCommandAtTime : Date?
+    fileprivate var sentEndCapabilityCommand : Bool = false
     
     //Ping - keep alive
-    private var nextPingTimeInterval : NSDate?
+    fileprivate var nextPingTimeInterval : Date?
     
     //Credentials
-    private var credentials : IRCCredentials?
+    fileprivate var credentials : IRCCredentials?
     
     //Server state
-    private var server : String?
-    private var realServer : String?
+    fileprivate var server : String?
+    fileprivate var realServer : String?
     
     //Commands
     var commandHandlers = [String : CommandHandlerFunc]()
@@ -70,28 +99,28 @@ class IRCConnection {
 // MARK - Computed properties
 ////////////////////////////////////////
     
-    private var recentlyConnected : Bool {
+    fileprivate var recentlyConnected : Bool {
         get {
-            guard let connectedDate = connectedDate as NSDate! else {
+            guard let connectedDate = connectedDate as Date! else {
                 return false
             }
-            return NSDate.timeIntervalSinceReferenceDate() - connectedDate.timeIntervalSinceReferenceDate > 10
+            return Date.timeIntervalSinceReferenceDate - connectedDate.timeIntervalSinceReferenceDate > 10
         }
     }
     
-    private var minimumSendQueueDelay : Double {
+    fileprivate var minimumSendQueueDelay : Double {
         get {
             return self.recentlyConnected ? 0.5 : 0.25
         }
     }
     
-    private var maximumSendQueueDelay : Double {
+    fileprivate var maximumSendQueueDelay : Double {
         get {
             return self.recentlyConnected ? 1.5 : 0.3
         }
     }
     
-    private var sendQueueDelayIncrement : Double {
+    fileprivate var sendQueueDelayIncrement : Double {
         get {
             return self.recentlyConnected ? 0.25 : 0.15
         }
@@ -102,11 +131,12 @@ class IRCConnection {
 ////////////////////////////////////////
     
     init (delegate : IRCConnectionDelegate) {
-        let queueAttr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_BACKGROUND, 0)
-        connectionQueue = dispatch_queue_create("com.irc.connection", queueAttr)
-        status = .Disconnected
-        sendQueue = [NSData]()
-        sendQueueLock = dispatch_semaphore_create(1)
+        connectionQueue = DispatchQueue(label: "com.irc.connection",
+                                        qos: .background,
+                                        attributes: [])
+        status = .disconnected
+        sendQueue = [Data]()
+        sendQueueLock = DispatchSemaphore(value: 1)
         self.delegate = delegate
         
         commandHandlers["PING"] = handlePing
@@ -116,28 +146,28 @@ class IRCConnection {
 // MARK - Public methods
 ////////////////////////////////////////
     
-    func connect(endpoint : IRCEndpoint, credentials : IRCCredentials, capabilities : IRCCapabilities) {
-        if status != .Disconnected &&
-           status != .ServerDisconnected &&
-           status != .Suspended {
+    func connect(_ endpoint : IRCEndpoint, credentials : IRCCredentials, capabilities : IRCCapabilities) {
+        if status != .disconnected &&
+           status != .serverDisconnected &&
+           status != .suspended {
             Logger.Warning("Current status does not allow connection")
             return
         }
         
         self.credentials = credentials
         self.capabilities = capabilities
-        lastConnectAttempt = NSDate()
-        queueWait = NSDate(timeIntervalSinceNow: QUEUE_WAIT_BEFORE_CONNECTED)
+        lastConnectAttempt = Date()
+        queueWait = Date(timeIntervalSinceNow: QUEUE_WAIT_BEFORE_CONNECTED)
 
         connect(endpoint)
     }
     
     func disconnect() {
-        status = .Disconnected
-        sendStringMessage("QUIT", immedtiately: true)
+        status = .disconnected
+        sendStringMessage("QUIT", immediately: true)
         
-        let dispatchTime: dispatch_time_t = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
-        dispatch_after(dispatchTime, dispatch_get_main_queue(), {
+        let dispatchTime: DispatchTime = DispatchTime.now() + Double(Int64(1 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+        DispatchQueue.main.asyncAfter(deadline: dispatchTime, execute: {
             self.chatConnection!.disconnectAfterWriting()
             Logger.Debug("Disconnected")
         })
@@ -146,37 +176,37 @@ class IRCConnection {
 // MARK - Connection
 ////////////////////////////////////////
     
-    private func connect(endpoint : IRCEndpoint) {
+    fileprivate func connect(_ endpoint : IRCEndpoint) {
         chatConnection = GCDAsyncSocket(delegate: self, delegateQueue: connectionQueue, socketQueue: connectionQueue)
-        chatConnection?.IPv6Enabled = true
-        chatConnection?.IPv4PreferredOverIPv6 = true
+        chatConnection?.isIPv6Enabled = true
+        chatConnection?.isIPv4PreferredOverIPv6 = true
         
         do {
-            try chatConnection?.connectToHost(endpoint.host, onPort: endpoint.port)
+            try chatConnection?.connect(toHost: endpoint.host, onPort: endpoint.port)
             resetSendQueueInterval()
         }
         catch _ {
-            dispatch_async(dispatch_get_main_queue(), {
+            DispatchQueue.main.async(execute: {
                 self.didNotConnect()
             })
         }
     }
     
-    private func didConnect() {
+    fileprivate func didConnect() {
         Logger.Debug("Connected")
-        status = .Connected
-        connectedDate = NSDate()
-        queueWait = NSDate(timeIntervalSinceNow: 0.5)
+        status = .connected
+        connectedDate = Date()
+        queueWait = Date(timeIntervalSinceNow: 0.5)
         resetSendQueueInterval()
         delegate.IRCConnectionDidConnect()
     }
     
-    private func didNotConnect() {
+    fileprivate func didNotConnect() {
         Logger.Error("Could not connect to host")
         delegate.IRCConnectionDidNotConnect()
     }
     
-    private func didDisconnect() {
+    fileprivate func didDisconnect() {
         Logger.Warning("Did disconnect from host")
         delegate.IRCConnectionDidDisconnect()
     }
@@ -185,16 +215,16 @@ class IRCConnection {
 // MARK - Send Queue
 ////////////////////////////////////////
     
-    private func resetSendQueueInterval() {
+    fileprivate func resetSendQueueInterval() {
         self.stopSendQueue()
-        dispatch_semaphore_wait(sendQueueLock, DISPATCH_TIME_FOREVER)
+        _ = sendQueueLock.wait(timeout: DispatchTime.distantFuture)
         if (self.sendQueue.count > 0){
             startSendQueue()
         }
-        dispatch_semaphore_signal(sendQueueLock)
+        sendQueueLock.signal()
     }
     
-    private func startSendQueue() {
+    fileprivate func startSendQueue() {
         if sendQueueProcessing {
             Logger.Warning("Send queue is already processing")
             return
@@ -203,45 +233,45 @@ class IRCConnection {
         sendQueueProcessing = true
 
         let timeInterval = (queueWait != nil && queueWait!.timeIntervalSinceNow > 0) ? queueWait!.timeIntervalSinceNow : minimumSendQueueDelay
-        let dispatchTime: dispatch_time_t = dispatch_time(DISPATCH_TIME_NOW, Int64(timeInterval * Double(NSEC_PER_SEC)))
-        dispatch_after(dispatchTime, dispatch_get_main_queue(), {
+        let dispatchTime: DispatchTime = DispatchTime.now() + Double(Int64(timeInterval * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+        DispatchQueue.main.asyncAfter(deadline: dispatchTime, execute: {
             Logger.Debug("Starting to process send queue")
             self.treatSendQueue()
         })
     }
     
-    private func stopSendQueue() {
+    fileprivate func stopSendQueue() {
         sendQueueProcessing = false
     }
     
-    private func treatSendQueue() {
-        dispatch_semaphore_wait(sendQueueLock, DISPATCH_TIME_FOREVER)
+    fileprivate func treatSendQueue() {
+        _ = sendQueueLock.wait(timeout: DispatchTime.distantFuture)
         if (self.sendQueue.count <= 0){
             Logger.Debug("Send queue is empty, stopping to process")
             sendQueueProcessing = false
             return
         }
-        dispatch_semaphore_signal(sendQueueLock)
+        sendQueueLock.signal()
         
         if queueWait != nil && queueWait?.timeIntervalSinceNow > 0 {
-            let dispatchTime: dispatch_time_t = dispatch_time(DISPATCH_TIME_NOW, Int64(queueWait!.timeIntervalSinceNow * Double(NSEC_PER_SEC)))
-            dispatch_after(dispatchTime, dispatch_get_main_queue(), {
+            let dispatchTime: DispatchTime = DispatchTime.now() + Double(Int64(queueWait!.timeIntervalSinceNow * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+            DispatchQueue.main.asyncAfter(deadline: dispatchTime, execute: {
                 self.treatSendQueue()
             })
             return
         }
         
-        dispatch_semaphore_wait(sendQueueLock, DISPATCH_TIME_FOREVER)
+        _ = sendQueueLock.wait(timeout: DispatchTime.distantFuture)
         let data = sendQueue.first
         sendQueue.removeFirst()
-        dispatch_semaphore_signal(sendQueueLock)
+        sendQueueLock.signal()
         
         if sendQueue.count > 0 {
             let calculatedQueueDelay = (minimumSendQueueDelay + (Double(sendQueue.count) * sendQueueDelayIncrement))
             let delay = calculatedQueueDelay > maximumSendQueueDelay ? maximumSendQueueDelay : calculatedQueueDelay
-            let dispatchTime: dispatch_time_t = dispatch_time(DISPATCH_TIME_NOW, Int64(delay * Double(NSEC_PER_SEC)))
+            let dispatchTime: DispatchTime = DispatchTime.now() + Double(Int64(delay * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
             
-            dispatch_after(dispatchTime, dispatch_get_main_queue(), {
+            DispatchQueue.main.asyncAfter(deadline: dispatchTime, execute: {
                 self.treatSendQueue()
             })
         }
@@ -250,8 +280,8 @@ class IRCConnection {
             sendQueueProcessing = false
         }
         
-        dispatch_async(connectionQueue, {
-            self.lastCommand = NSDate()
+        connectionQueue.async(execute: {
+            self.lastCommand = Date()
             self.writeDataToServer(data!)
         })
     }
@@ -260,50 +290,52 @@ class IRCConnection {
 // MARK - Outgoing data
 ////////////////////////////////////////
     
-    private func writeDataToServer(data : NSData) {
+    fileprivate func writeDataToServer(_ data : Data) {
         // IRC messages are always lines of characters terminated with a CR-LF
         // (Carriage Return - Line Feed) pair, and these messages SHALL NOT
         // exceed 512 characters in length, counting all characters including
         // the trailing CR-LF. Thus, there are 510 characters maximum allowed
         // for the command and its parameters.
-        var vdata : NSMutableData = NSMutableData()
+        var vdata = Data()
         
-        if data.length > MAXIMUM_COMMAND_LENGHT {
-            vdata = NSMutableData(data: data.subdataWithRange(NSRange(location: 0, length: MAXIMUM_COMMAND_LENGHT)))
+        if data.count > MAXIMUM_COMMAND_LENGTH {
+            let range = Range(uncheckedBounds: (lower: 0, upper: MAXIMUM_COMMAND_LENGTH))
+            let subdata = data.subdata(in: range)
+            vdata = subdata
         } else {
-            vdata = NSMutableData(data: data)
+            vdata = data
         }
-        
-        
+
         if vdata.hasSuffix(bytes: [0x0D]) {
-            vdata.appendBytes(bytes: [0x0A])
+            vdata.append(contentsOf: [0x0A])
         }
         else if !vdata.hasSuffix(bytes: [0x0D, 0x0A]){
             if vdata.hasSuffix(bytes: [0x0A]){
-                vdata.replaceBytesInRange(NSRange(location: vdata.length - 1, length: 1), bytes: [0x0D, 0x0A])
+                let range = Range(uncheckedBounds: (vdata.count - 1, vdata.count))
+                vdata.replaceSubrange(range, with: [0x0D, 0x0A])
             }
             else {
-                vdata.appendBytes(bytes: [0x0D, 0x0A])
+                vdata.append(contentsOf: [0x0D, 0x0A])
             }
         }
         
-        chatConnection!.writeData(vdata, withTimeout: -1, tag: 0)
+        chatConnection!.write(vdata, withTimeout: -1, tag: 0)
         
-        Logger.Info("Wrote: \(String(data: vdata, encoding: NSUTF8StringEncoding)!)")
+        Logger.Info("Wrote: \(String(data: vdata, encoding: String.Encoding.utf8)!)")
     }
     
-    func sendStringMessage(message : String, immedtiately now : Bool) {
-        sendRawMessage(message.dataUsingEncoding(NSUTF8StringEncoding)!, immeditately: now)
+    func sendStringMessage(_ message : String, immediately now : Bool) {
+        sendRawMessage(message.data(using: String.Encoding.utf8)!, immediately: now)
     }
     
-    func sendRawMessage(raw : NSData, immeditately now : Bool) {
-        Logger.Info("Queing: \(String(data: raw, encoding: NSUTF8StringEncoding)!)")
+    fileprivate func sendRawMessage(_ raw : Data, immediately now : Bool) {
+        Logger.Info("Queueing: \(String(data: raw, encoding: String.Encoding.utf8)!)")
         
         var nnow = now
         if !nnow {
-            dispatch_semaphore_wait(sendQueueLock, DISPATCH_TIME_FOREVER)
+            _ = sendQueueLock.wait(timeout: DispatchTime.distantFuture)
             nnow = sendQueue.count == 0
-            dispatch_semaphore_signal(sendQueueLock)
+            sendQueueLock.signal()
         }
         
         if nnow {
@@ -315,18 +347,18 @@ class IRCConnection {
         }
         
         if nnow {
-            dispatch_async(connectionQueue, {
-                self.lastCommand = NSDate()
+            connectionQueue.async(execute: {
+                self.lastCommand = Date()
                 self.writeDataToServer(raw)
             })
         }
         else {
-            dispatch_semaphore_wait(sendQueueLock, DISPATCH_TIME_FOREVER)
+            _ = sendQueueLock.wait(timeout: DispatchTime.distantFuture)
             sendQueue.append(raw)
-            dispatch_semaphore_signal(sendQueueLock)
+            sendQueueLock.signal()
             
             if !sendQueueProcessing {
-                dispatch_async(dispatch_get_main_queue(), {
+                DispatchQueue.main.async(execute: {
                     self.startSendQueue()
                 })
             }
@@ -337,67 +369,67 @@ class IRCConnection {
 // MARK - Capability requests
 ////////////////////////////////////////
 
-    private func cancelScheduledSendEndCapabilityCommand() {
+    fileprivate func cancelScheduledSendEndCapabilityCommand() {
         sendEndCapabilityCommandAtTime = nil
     }
     
-    private func sendEndCapabilityCommandAfterTimeout() {
+    fileprivate func sendEndCapabilityCommandAfterTimeout() {
         cancelScheduledSendEndCapabilityCommand()
         
-        sendEndCapabilityCommandAtTime = NSDate(timeIntervalSinceNow: END_CAPABILITY_TIMEOUT_DELAY)
+        sendEndCapabilityCommandAtTime = Date(timeIntervalSinceNow: END_CAPABILITY_TIMEOUT_DELAY)
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64((UInt64(END_CAPABILITY_TIMEOUT_DELAY) * NSEC_PER_SEC))), connectionQueue, {
+        connectionQueue.asyncAfter(deadline: DispatchTime.now() + Double(Int64((UInt64(END_CAPABILITY_TIMEOUT_DELAY) * NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: {
             self.sendEndCapabilityCommand(forcefully: false)
         })
         
     }
     
-    private func sendEndCapabilityCommandSoon() {
+    fileprivate func sendEndCapabilityCommandSoon() {
         cancelScheduledSendEndCapabilityCommand()
         
-        sendEndCapabilityCommandAtTime = NSDate(timeIntervalSinceNow: 1)
+        sendEndCapabilityCommandAtTime = Date(timeIntervalSinceNow: 1)
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64((UInt64(END_CAPABILITY_TIMEOUT_DELAY) * NSEC_PER_SEC))), connectionQueue, {
+        connectionQueue.asyncAfter(deadline: DispatchTime.now() + Double(Int64((UInt64(END_CAPABILITY_TIMEOUT_DELAY) * NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: {
             self.sendEndCapabilityCommand(forcefully: false)
         })
     }
     
-    private func sendEndCapabilityCommand(forcefully force : Bool) {
+    fileprivate func sendEndCapabilityCommand(forcefully force : Bool) {
         if sentEndCapabilityCommand { return }
         
         if !force && sendEndCapabilityCommandAtTime == nil { return }
         
         sentEndCapabilityCommand = true
         
-        sendStringMessage("CAP END", immedtiately: true)
+        sendStringMessage("CAP END", immediately: true)
     }
     
 ////////////////////////////////////////
 // MARK - Pinging
 ////////////////////////////////////////
 
-    private func pingServer() {
+    fileprivate func pingServer() {
         let server = realServer == nil ? self.server : realServer
-        sendStringMessage("PING \(server)", immedtiately: true)
+        sendStringMessage("PING \(server)", immediately: true)
     }
     
-    private func pingServerAfterInterval() {
-        if status != .Connecting &&
-           status != .Connected {
+    fileprivate func pingServerAfterInterval() {
+        if status != .connecting &&
+           status != .connected {
             Logger.Warning("Could not ping since we're not connected")
             return
         }
         
-        nextPingTimeInterval = NSDate(timeIntervalSinceNow: PING_SERVER_INTERVAL)
+        nextPingTimeInterval = Date(timeIntervalSinceNow: PING_SERVER_INTERVAL)
         let delayInSeconds = UInt64(PING_SERVER_INTERVAL + 1)
         
-        let popTime = dispatch_time(DISPATCH_TIME_NOW, Int64(delayInSeconds * NSEC_PER_SEC))
+        let popTime = DispatchTime.now() + Double(Int64(delayInSeconds * NSEC_PER_SEC)) / Double(NSEC_PER_SEC)
         
-        dispatch_after(popTime, connectionQueue, {
-            let nowTimeInterval = NSDate.timeIntervalSinceReferenceDate()
+        connectionQueue.asyncAfter(deadline: popTime, execute: {
+            let nowTimeInterval = Date.timeIntervalSinceReferenceDate
             
             if self.nextPingTimeInterval!.timeIntervalSinceReferenceDate < nowTimeInterval {
-                self.nextPingTimeInterval = NSDate(timeIntervalSinceNow: self.PING_SERVER_INTERVAL)
+                self.nextPingTimeInterval = Date(timeIntervalSinceNow: self.PING_SERVER_INTERVAL)
                 self.pingServer()
             }
         })
@@ -407,14 +439,14 @@ class IRCConnection {
 // MARK - Incoming data
 ////////////////////////////////////////
 
-    private func readNextMessageFromServer() {
+    fileprivate func readNextMessageFromServer() {
         // IRC messages end in \x0D\x0A, but some non-compliant servers only use \x0A during the connecting phase
-        chatConnection?.readDataToData(GCDAsyncSocket.LFData(), withTimeout: -1, tag: 0)
+        chatConnection?.readData(to: GCDAsyncSocket.lfData(), withTimeout: -1, tag: 0)
     }
     
-    private func processIncomingMessage(data : NSData, fromServer : Bool) {
+    fileprivate func processIncomingMessage(_ data : Data, fromServer : Bool) {
 
-        if var messageString = String(data: data, encoding: NSUTF8StringEncoding) {
+        if var messageString = String(data: data, encoding: String.Encoding.utf8) {
             var currentIndex = 0
             let len = messageString.characters.count
             var sender : String?
@@ -437,8 +469,9 @@ class IRCConnection {
                         let startIndex = currentIndex
                         while notEndOfLine() && messageString[currentIndex] != " " { currentIndex += 1 }
                         let endIndex = currentIndex
-                        
-                        intentOrTags = messageString[startIndex...endIndex-1]
+                        let length = endIndex - 1 - startIndex
+                        intentOrTags = messageString.substring(startIndex, length: length)
+
                         checkAndMarkIfDone()
                         consumeWhitespace()
                     }
@@ -454,8 +487,9 @@ class IRCConnection {
                         messageString[currentIndex] != "@"
                         { currentIndex += 1 }
                     let senderEndIndex = currentIndex
-                    
-                    sender = messageString[senderStartIndex...senderEndIndex-1]
+                    let length = senderEndIndex - 1 - senderStartIndex
+                    sender = messageString.substring(senderStartIndex, length: length)
+
                     checkAndMarkIfDone()
                     
                     if !done && messageString[currentIndex] != "!" {
@@ -466,8 +500,9 @@ class IRCConnection {
                             messageString[currentIndex] != "@"
                             { currentIndex += 1 }
                         let userEndIndex = currentIndex
-                        
-                        user = messageString[userStartIndex...userEndIndex-1]
+                        let length = userEndIndex - 1 - userStartIndex
+                        user = messageString.substring(userStartIndex, length: length)
+
                         checkAndMarkIfDone()
                     }
                     
@@ -476,8 +511,8 @@ class IRCConnection {
                         let hostStartIndex = currentIndex
                         while notEndOfLine() && messageString[currentIndex] != " " { currentIndex += 1 }
                         let hostEndIndex = currentIndex
-                        
-                        host = messageString[hostStartIndex...hostEndIndex-1]
+                        let length = hostEndIndex - 1 - hostStartIndex
+                        host = messageString.substring(hostStartIndex, length: length)
                         checkAndMarkIfDone()
                     }
                     
@@ -491,9 +526,10 @@ class IRCConnection {
                     // number: '0' ... '9'
                     let cmdStartIndex = currentIndex
                     while notEndOfLine() && messageString[currentIndex] != " " { currentIndex += 1 }
+
                     let cmdEndIndex = currentIndex
-                    
-                    command = messageString[cmdStartIndex...cmdEndIndex-1]
+                    let length = cmdEndIndex - 1 - cmdStartIndex
+                    command = messageString.substring(cmdStartIndex, length: length)
                     
                     checkAndMarkIfDone()
                     if !done { currentIndex += 1 }
@@ -507,23 +543,26 @@ class IRCConnection {
                     if messageString[currentIndex] == ":" {
                         currentIndex += 1
                         let currentParamStartIndex = currentIndex
+                        let length = len - 1 - currentParamStartIndex
                         
-                        currentParameter = messageString[currentParamStartIndex...len - 1]
+                        currentParameter = messageString.substring(currentParamStartIndex,
+                                                                   length: length)
                         currentIndex = len - 1
                     }
                     else {
                         let currentParamStartIndex = currentIndex
                         while notEndOfLine() && messageString[currentIndex] != " " { currentIndex += 1 }
                         let currentParamEndIndex = currentIndex
-                        
-                        currentParameter = messageString[currentParamStartIndex...currentParamEndIndex-1]
+                        let subStringLength = currentParamEndIndex - 1 - currentParamStartIndex
+                        currentParameter = messageString.substring(currentParamStartIndex,
+                                                                   length: subStringLength)
                         
                         checkAndMarkIfDone()
                         if !done { currentIndex += 1 }
                     }
                     
                     if let param = currentParameter as String! {
-                        parameters.append(param.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet()))
+                        parameters.append(param.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
                     }
                     
                     consumeWhitespace()
@@ -533,8 +572,8 @@ class IRCConnection {
             var intentOrTagDict = [String : String]()
             
             if let intentOrTags = intentOrTags as String! {
-                for anItentOrTag in intentOrTags.componentsSeparatedByString(";") {
-                    let intentOrTagPair = anItentOrTag.componentsSeparatedByString("=")
+                for anItentOrTag in intentOrTags.components(separatedBy: ";") {
+                    let intentOrTagPair = anItentOrTag.components(separatedBy: "=")
                     
                     if intentOrTagPair.count != 2 { continue }
                     
@@ -544,7 +583,7 @@ class IRCConnection {
             
             if let handler = commandHandlers[command!] {
                 let msg = IRCMessage(sender: sender, user: user, host: host, command: command, intentOrTags: intentOrTagDict, parameters: parameters)
-                handler(message: msg)
+                handler(msg)
             }
             else {
                 Logger.Warning("No handler found for command: \(command!)")
@@ -558,9 +597,9 @@ class IRCConnection {
         }
     }
     
-    private func handlePing(message : IRCMessage) -> () {
+    fileprivate func handlePing(_ message : IRCMessage) -> () {
         //parameters[0] is the PONG response
-        sendStringMessage("PONG \(message.parameters[0])", immedtiately: true)
+        sendStringMessage("PONG \(message.parameters[0])", immediately: true)
     }
 }
 
@@ -570,13 +609,13 @@ class IRCConnection {
 
 extension IRCConnection : GCDAsyncSocketDelegate {
     @objc
-    func socket(sock: GCDAsyncSocket!, didConnectToHost host: String!, port: UInt16) {
+    func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
         
         if credentials?.password?.characters.count > 0 {
-            sendStringMessage("PASS \(credentials!.password!)", immedtiately: true)
+            sendStringMessage("PASS \(credentials!.password!)", immediately: true)
         }
         
-        sendStringMessage("NICK \(credentials!.nick)", immedtiately: true)
+        sendStringMessage("NICK \(credentials!.nick)", immediately: true)
         //TODO(Olivier): In with twitch we don't deal with the USER ... command. Implement it if necessary
         //[self sendRawMessageImmediatelyWithFormat:@"USER %@ 0 * :%@", username, ( _realName.length ? _realName : @"Anonymous User" )];
         
@@ -584,10 +623,10 @@ extension IRCConnection : GCDAsyncSocketDelegate {
         
         let capabilitiesCommand = capabilities!.getIRCCommandString()
         if let cmd = capabilitiesCommand as String! {
-            sendStringMessage(cmd, immedtiately: true)
+            sendStringMessage(cmd, immediately: true)
         }
         
-        dispatch_async(dispatch_get_main_queue(), {
+        DispatchQueue.main.async(execute: {
             self.didConnect()
         })
 
@@ -597,37 +636,37 @@ extension IRCConnection : GCDAsyncSocketDelegate {
     }
     
     @objc
-    func socket(sock: GCDAsyncSocket!, didReadData data: NSData!, withTag tag: Int) {
+    func socket(_ sock: GCDAsyncSocket, didRead data: Data, withTag tag: Int) {
         processIncomingMessage(data, fromServer: true)
         readNextMessageFromServer()
     }
     
     @objc
-    func socketDidDisconnect(sock: GCDAsyncSocket!, withError err: NSError!) {
+    func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
         
         if sock != chatConnection { return }
         
         lastError = err
         
-        dispatch_async(dispatch_get_main_queue(), {
+        DispatchQueue.main.async(execute: {
             self.stopSendQueue()
         })
         
-        dispatch_semaphore_wait(sendQueueLock, DISPATCH_TIME_FOREVER)
+        _ = sendQueueLock.wait(timeout: DispatchTime.distantFuture)
         self.sendQueue.removeAll()
-        dispatch_semaphore_signal(sendQueueLock)
+        sendQueueLock.signal()
         
-        if status == .Connecting {
+        if status == .connecting {
             if lastError == nil {
-                dispatch_async(dispatch_get_main_queue(), {
+                DispatchQueue.main.async(execute: {
                     self.didNotConnect()
                 })
             }
         }
         else {
-            if lastError != nil && status != .Disconnected {
-                status = .Disconnected
-                dispatch_async(dispatch_get_main_queue(), {
+            if lastError != nil && status != .disconnected {
+                status = .disconnected
+                DispatchQueue.main.async(execute: {
                     self.didDisconnect()
                 })
             }

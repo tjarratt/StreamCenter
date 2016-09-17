@@ -17,7 +17,7 @@ struct TokenHelper {
     static let HITBOX_TOKEN_KEY = "com.StreamCenter.Hitbox.TOKEN_KEY"
     static let HITBOX_USERNAME_KEY = "com.StreamCenter.Hitbox.USERNAME_KEY"
     
-    static func storeTwitchToken(token: String) {
+    static func storeTwitchToken(_ token: String) {
         let keychain = Keychain(service: TokenHelper.TWITCH_SERVICE)
         keychain[TokenHelper.TWITCH_TOKEN_KEY] = token
     }
@@ -36,7 +36,7 @@ struct TokenHelper {
         }
     }
     
-    static func storeHitboxToken(token: String) {
+    static func storeHitboxToken(_ token: String) {
         let keychain = Keychain(service: TokenHelper.HITBOX_SERVICE)
         keychain[TokenHelper.HITBOX_TOKEN_KEY] = token
     }
@@ -55,7 +55,7 @@ struct TokenHelper {
         }
     }
     
-    static func storeHitboxUsername(username: String) {
+    static func storeHitboxUsername(_ username: String) {
         let keychain = Keychain(service: TokenHelper.HITBOX_SERVICE)
         keychain[TokenHelper.HITBOX_USERNAME_KEY] = username
     }

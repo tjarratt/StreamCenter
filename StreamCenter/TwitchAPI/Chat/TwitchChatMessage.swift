@@ -31,18 +31,18 @@ extension IRCMessage {
         
         if let emoteString = self.intentOrTags["emotes"] {
             if emoteString.characters.count > 0 {
-                let emotesById = emoteString.containsString("/") ? emoteString.componentsSeparatedByString("/") : [emoteString]
+                let emotesById = emoteString.contains("/") ? emoteString.components(separatedBy: "/") : [emoteString]
                 
                 for emote in emotesById {
                     // id = [0] and values = [1]
-                    let rangesById = emote.componentsSeparatedByString(":")
+                    let rangesById = emote.components(separatedBy: ":")
                     let emoteId = rangesById[0]
-                    let emoteRawRanges = rangesById[1].componentsSeparatedByString(",")
+                    let emoteRawRanges = rangesById[1].components(separatedBy: ",")
                     
                     if let rawRange = emoteRawRanges.first {
-                        let startEnd = rawRange.componentsSeparatedByString("-")
-                        if let start = Int(startEnd[0]), end = Int(startEnd[1]) {
-                            let emote = message[start...end]
+                        let startEnd = rawRange.components(separatedBy: "-")
+                        if let start = Int(startEnd[0]), let end = Int(startEnd[1]) {
+                            let emote = message.substring(start, length: end-start)
                             
                             emotes[emoteId] = emote
                         }

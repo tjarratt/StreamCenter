@@ -17,13 +17,13 @@ struct TwitchChannel {
     let logo : String?
     let status : String!
     let videoBanner : String?
-    let lastUpdate : NSDate!
+    let lastUpdate : Date!
     let followers : Int!
     let views : Int!
     
     init(id : Int, name : String, displayName : String, links : [String : String], broadcasterLanguage : String?,
         language : String, gameName : String, logo : String?, status : String, videoBanner : String?,
-        lastUpdate : NSDate, followers : Int, views : Int) {
+        lastUpdate : Date, followers : Int, views : Int) {
         self.id = id
         self.name = name
         self.displayName = displayName
@@ -70,13 +70,13 @@ struct TwitchChannel {
         self.gameName = gameName
         self.status = status
         
-        let dateFormatter = NSDateFormatter()
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssXXX"
-        if let updateDateString = dict["updated_at"] as? String, updateDate = dateFormatter.dateFromString(updateDateString) {
+        if let updateDateString = dict["updated_at"] as? String, let updateDate = dateFormatter.date(from: updateDateString) {
             self.lastUpdate = updateDate
         }
         else {
-            self.lastUpdate = NSDate()
+            self.lastUpdate = Date()
         }
         
         if let followers = dict["followers"] as? Int {
@@ -100,8 +100,8 @@ struct TwitchChannel {
     
     var displayLanguage: String? {
         get {
-            if let display = NSLocale(localeIdentifier: language).displayNameForKey(NSLocaleLanguageCode, value: language) {
-                return display.lowercaseString
+            if let display = (Locale(identifier: language) as NSLocale).displayName(forKey: NSLocale.Key.languageCode, value: language) {
+                return display.lowercased()
             }
             return nil
         }

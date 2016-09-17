@@ -89,7 +89,7 @@ struct TwitchStream: CellItem {
         }
     }
     
-    mutating func setImage(image: UIImage) {
+    mutating func setImage(_ image: UIImage) {
         mImage = image
     }
 }

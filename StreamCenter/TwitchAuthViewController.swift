@@ -39,8 +39,8 @@ class TwitchAuthViewController: QRCodeViewController {
         StreamCenterService.authenticateTwitch(withCode: code, andUUID: UUID) { (token, error) -> () in
             Logger.Debug("Token: \(token)")
             guard let token = token else {
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    self.titleLabel.textColor = UIColor.redColor()
+                DispatchQueue.main.async(execute: { () -> Void in
+                    self.titleLabel.textColor = UIColor.red
                     if let error = error {
                         self.titleLabel.text = "\(error.errorDescription)\nPlease ensure that your code is correct and press 'Process' again."
                     } else {

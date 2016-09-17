@@ -17,13 +17,13 @@ class ChatTopView: UILabel {
         
         adjustsFontSizeToFitWidth = true
         
-        textColor = UIColor.whiteColor()
+        textColor = UIColor.white
         backgroundColor = UIColor(hexString: "#555555")
-        textAlignment = .Center
-        font = UIFont.systemFontOfSize(30)
+        textAlignment = .center
+        font = UIFont.systemFont(ofSize: 30)
         
         self.layer.masksToBounds = false
-        self.layer.shadowOffset = CGSizeMake(0, 15)
+        self.layer.shadowOffset = CGSize(width: 0, height: 15)
         self.layer.shadowRadius = 5
         self.layer.shadowOpacity = 0.5
         

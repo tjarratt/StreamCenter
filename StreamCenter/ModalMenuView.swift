@@ -27,7 +27,7 @@ class ModalMenuView : UIView {
         self.menuItemSize = ModalMenuView.requiredMenuItemHeightToFit(menuOptions, menuSize: size)
         super.init(frame: frame)
         
-        self.userInteractionEnabled = true
+        self.isUserInteractionEnabled = true
         
         self.backgroundColor = UIColor(white: 0.8, alpha: 0.8)
         self.buildMenuItemViews()
@@ -40,7 +40,7 @@ class ModalMenuView : UIView {
         super.init(coder: aDecoder)
     }
     
-    static func requiredMenuItemHeightToFit(menuOptions : [String : [MenuOption]], menuSize : CGSize) -> CGSize {
+    static func requiredMenuItemHeightToFit(_ menuOptions : [String : [MenuOption]], menuSize : CGSize) -> CGSize {
         var count : CGFloat = 0
         for menuOptionsArray in menuOptions {
             count += CGFloat(1 + menuOptionsArray.1.count)
@@ -51,19 +51,20 @@ class ModalMenuView : UIView {
     
     func buildMenuItemViews() {
         var currentIndex = 0
-        for i in (0 ..< self.menuOptions.count).reverse() {
+        for (name, menuOptions) in self.menuOptions {
             let menuTitle = UILabel(frame: self.getFrameForItemAtIndex(currentIndex))
             
-            menuTitle.text = self.menuOptions[i].key
-            menuTitle.textAlignment = NSTextAlignment.Center
-            menuTitle.font = UIFont.systemFontOfSize(self.menuItemSize.height * 0.8, weight: 0.5)
-            menuTitle.textColor = UIColor.whiteColor()
+            menuTitle.text = name
+            menuTitle.textAlignment = NSTextAlignment.center
+            menuTitle.font = UIFont.systemFont(ofSize: self.menuItemSize.height * 0.8, weight: 0.5)
+            menuTitle.textColor = UIColor.white
             
             self.addSubview(menuTitle)
             
-            for j in 0 ..< self.menuOptions[i].value.count  {
+            for menuOption in menuOptions {
                 currentIndex += 1
-                let optionView = MenuItemView(frame: self.getFrameForItemAtIndex(currentIndex), option: self.menuOptions[i].value[j])
+                let optionView = MenuItemView(frame: self.getFrameForItemAtIndex(currentIndex),
+                                              option: menuOption)
                 
                 self.addSubview(optionView)
             }
@@ -71,7 +72,7 @@ class ModalMenuView : UIView {
         }
     }
     
-    func getFrameForItemAtIndex(index : Int) -> CGRect {
+    func getFrameForItemAtIndex(_ index : Int) -> CGRect {
         
         var y = (self.bounds.height - (CGFloat(self.menuItemCount) * self.menuItemSize.height))/2 + CGFloat(index) * self.menuItemSize.height
         
@@ -95,18 +96,18 @@ class MenuItemView : UIView {
         super.init(frame: frame)
         
         self.gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(MenuItemView.handleSelect))
-        self.gestureRecognizer!.allowedPressTypes = [UIPressType.Select.rawValue]
+        self.gestureRecognizer!.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
         self.addGestureRecognizer(self.gestureRecognizer!)
         
         
         self.title = UILabel(frame: self.bounds)
         
         self.title.text = self.option.isEnabled ? self.option.enabledTitle : self.option.disabledTitle
-        self.title.textAlignment = NSTextAlignment.Center
-        self.title.font = UIFont.systemFontOfSize(self.bounds.height * 0.7, weight: 0)
-        self.title.textColor = UIColor.whiteColor()
+        self.title.textAlignment = NSTextAlignment.center
+        self.title.font = UIFont.systemFont(ofSize: self.bounds.height * 0.7, weight: 0)
+        self.title.textColor = UIColor.white
         
-        self.userInteractionEnabled = true
+        self.isUserInteractionEnabled = true
         
         self.backgroundColor = UIColor(white: 0.5, alpha: 0.9)
         self.addSubview(self.title!)
@@ -119,19 +120,19 @@ class MenuItemView : UIView {
     }
     
     func handleSelect() {
-        self.option.clickCallback(sender: self)
+        self.option.clickCallback(self)
     }
     
     func isOptionEnabled() -> Bool {
         return self.option.isEnabled
     }
     
-    func setOptionEnabled(enabled : Bool) {
+    func setOptionEnabled(_ enabled : Bool) {
         self.option.isEnabled = enabled
         self.title!.text = self.option.isEnabled ? self.option.enabledTitle : self.option.disabledTitle
     }
     
-    override func canBecomeFocused() -> Bool {
+    override var canBecomeFocused : Bool {
         
         if self.option.disabledTitle != self.option.enabledTitle {
             return true
@@ -142,13 +143,13 @@ class MenuItemView : UIView {
         
     }
     
-    override func didUpdateFocusInContext(context: UIFocusUpdateContext, withAnimationCoordinator coordinator: UIFocusAnimationCoordinator) {
-        super.didUpdateFocusInContext(context, withAnimationCoordinator: coordinator)
+    override func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
+        super.didUpdateFocus(in: context, with: coordinator)
         if(context.nextFocusedView == self){
             coordinator.addCoordinatedAnimations({
                 
-                self.title!.textColor = UIColor.blackColor()
-                self.backgroundColor = UIColor.whiteColor()
+                self.title!.textColor = UIColor.black
+                self.backgroundColor = UIColor.white
                 
                 let newFrame = CGRect(
                     x: self.bounds.origin.x - (self.bounds.width * 0.1)/2,
@@ -167,7 +168,7 @@ class MenuItemView : UIView {
         else if(context.previouslyFocusedView == self) {
             coordinator.addCoordinatedAnimations({
                 
-                self.title!.textColor = UIColor.whiteColor()
+                self.title!.textColor = UIColor.white
                 self.backgroundColor = UIColor(white: 0.5, alpha: 0.9)
                 
                 let newFrame = CGRect(
@@ -192,10 +193,10 @@ struct MenuOption {
     let enabledTitle : String
     let disabledTitle : String
     var isEnabled : Bool
-    var clickCallback : (sender: MenuItemView?)->()
+    var clickCallback : (_ sender: MenuItemView?)->()
     var parameters : [String : AnyObject]?
     
-    init(enabledTitle : String, disabledTitle : String, enabled : Bool, parameters: [String : AnyObject]? = nil, onClick : (sender : MenuItemView?)->()) {
+    init(enabledTitle : String, disabledTitle : String, enabled : Bool, parameters: [String : AnyObject]? = nil, onClick : @escaping (_ sender : MenuItemView?)->()) {
         self.enabledTitle = enabledTitle
         self.disabledTitle = disabledTitle
         self.isEnabled = enabled
@@ -203,7 +204,7 @@ struct MenuOption {
         self.parameters = parameters
     }
     
-    init(title : String, enabled : Bool, parameters: [String : AnyObject]? = nil, onClick : (sender : MenuItemView?)->()) {
+    init(title : String, enabled : Bool, parameters: [String : AnyObject]? = nil, onClick : @escaping (_ sender : MenuItemView?)->()) {
         self.enabledTitle = title
         self.disabledTitle = title
         self.isEnabled = enabled

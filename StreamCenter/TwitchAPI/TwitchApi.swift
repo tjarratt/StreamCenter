@@ -1,12 +1,35 @@
 import Foundation
 
-protocol TwitchApi {
-    func getStreamsForChannel(channel : String, completionHandler: (streams: [TwitchStreamVideo]?, error: ServiceError?) -> ())
-    func getTopGamesWithOffset(offset : Int, limit : Int, completionHandler: (games: [TwitchGame]?, error: ServiceError?) -> ())
-    func getTopStreamsForGameWithOffset(game : String, offset : Int, limit : Int, completionHandler: (streams: [TwitchStream]?, error: ServiceError?) -> ())
-    func getGamesWithSearchTerm(term: String, offset : Int, limit : Int, completionHandler: (games: [TwitchGame]?, error: ServiceError?) -> ())
-    func getStreamsWithSearchTerm(term : String, offset : Int, limit : Int, completionHandler: (streams: [TwitchStream]?, error: ServiceError?) -> ())
-    func getStreamsThatUserIsFollowing(offset : Int, limit : Int, completionHandler: (streams: [TwitchStream]?, error: ServiceError?) -> ())
+typealias StreamVideoCompletionHandler = (_ streams: [TwitchStreamVideo]?, _ error: ServiceError?) -> ()
+typealias TwitchGameCompletionHandler = (_ games: [TwitchGame]?, _ error: ServiceError?) -> ()
+typealias TwitchStreamCompletionHandler = (_ streams: [TwitchStream]?, _ error: ServiceError?) -> ()
 
-    func getEmoteUrlStringFromId(id : String) -> String
+protocol TwitchApi {
+    func getStreamsForChannel(_ channel : String,
+                      completionHandler : @escaping StreamVideoCompletionHandler)
+
+    func getTopGamesWithOffset(_ offset : Int,
+                                  limit : Int,
+                       completionHandler: @escaping TwitchGameCompletionHandler)
+
+    func getTopStreamsForGameWithOffset(_ game : String,
+                                        offset : Int,
+                                         limit : Int,
+                              completionHandler: @escaping TwitchStreamCompletionHandler)
+
+    func getGamesWithSearchTerm(_ term : String,
+                                offset : Int,
+                                 limit : Int,
+                      completionHandler: @escaping TwitchGameCompletionHandler)
+
+    func getStreamsWithSearchTerm(_ term : String,
+                                  offset : Int,
+                                   limit : Int,
+                        completionHandler: @escaping TwitchStreamCompletionHandler)
+
+    func getStreamsThatUserIsFollowing(_ offset : Int,
+                                          limit : Int,
+                               completionHandler: @escaping TwitchStreamCompletionHandler)
+
+    func getEmoteUrlStringFromId(_ id : String) -> String
 }

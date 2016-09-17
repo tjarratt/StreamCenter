@@ -8,9 +8,12 @@ import UIKit
 import Foundation
 
 extension String {
-    func rangeFromNSRange(nsRange : NSRange) -> Range<String.Index>? {
-        let from16 = utf16.startIndex.advancedBy(nsRange.location, limit: utf16.endIndex)
-        let to16 = from16.advancedBy(nsRange.length, limit: utf16.endIndex)
+    func rangeFromNSRange(_ nsRange : NSRange) -> Range<String.Index>? {
+        let from16 = utf16.index(utf16.startIndex,
+                                 offsetBy: nsRange.location,
+                                 limitedBy: utf16.endIndex) ?? utf16.endIndex
+        let to16 = from16.advanced(by: nsRange.length)
+
         if let from = String.Index(from16, within: self),
             let to = String.Index(to16, within: self) {
                 return from ..< to
@@ -30,24 +33,29 @@ extension String {
 extension String {
     subscript (r: Range<Int>) -> String {
         get {
-            let subStart = self.startIndex.advancedBy(r.startIndex, limit: self.endIndex)
-            let subEnd = subStart.advancedBy(r.endIndex - r.startIndex, limit: self.endIndex)
+            let subStart = characters.index(self.startIndex,
+                                       offsetBy: r.lowerBound,
+                                       limitedBy: self.endIndex) ?? self.endIndex
+            let subEnd = characters.index(subStart,
+                                          offsetBy: r.upperBound - r.lowerBound,
+                                          limitedBy: self.endIndex) ?? self.endIndex
+
             let range : Range = subStart ..< subEnd
-            return self.substringWithRange(range)
+            return self.substring(with: range)
         }
     }
     subscript (i: Int) -> Character {
-        return self[self.startIndex.advancedBy(i)]
+        return self[self.characters.index(self.startIndex, offsetBy: i)]
     }
     
     subscript (i: Int) -> String {
         return String(self[i] as Character)
     }
-    func substring(from: Int) -> String {
+    func substring(_ from: Int) -> String {
         let end = self.characters.count
         return self[from..<end]
     }
-    func substring(from: Int, length: Int) -> String {
+    func substring(_ from: Int, length: Int) -> String {
         let end = from + length
         return self[from..<end]
     }
@@ -60,17 +68,17 @@ extension String {
 }
 
 extension String {
-    func widthWithConstrainedHeight(height: CGFloat, font: UIFont) -> CGFloat {
-        let constraintRect = CGSize(width: CGFloat.max, height: height)
+    func widthWithConstrainedHeight(_ height: CGFloat, font: UIFont) -> CGFloat {
+        let constraintRect = CGSize(width: CGFloat.greatestFiniteMagnitude, height: height)
         
-        let boundingBox = self.boundingRectWithSize(constraintRect, options: [.UsesFontLeading, .UsesLineFragmentOrigin], attributes: [NSFontAttributeName: font], context: nil)
+        let boundingBox = self.boundingRect(with: constraintRect, options: [.usesFontLeading, .usesLineFragmentOrigin], attributes: [NSFontAttributeName: font], context: nil)
         
         return boundingBox.width
     }
 }
 
 extension String {
-    static func randomStringWithLength(len: Int) -> String {
+    static func randomStringWithLength(_ len: Int) -> String {
         
         let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         
@@ -79,7 +87,7 @@ extension String {
         for _ in (0 ..< len) {
             let length = UInt32(letters.characters.count)
             let rand = Int(arc4random_uniform(length))
-            randomString.append(letters[letters.startIndex.advancedBy(rand)])
+            randomString.append(letters[letters.characters.index(letters.startIndex, offsetBy: rand)])
         }
         
         return randomString
@@ -90,10 +98,10 @@ extension String {
     func sanitizedIRCString() -> String {
         //https://github.com/ircv3/ircv3-specifications/blob/master/core/message-tags-3.2.md#escaping-values
         return self
-            .stringByReplacingOccurrencesOfString("\\:", withString: ";")
-            .stringByReplacingOccurrencesOfString("\\s", withString: "")
-            .stringByReplacingOccurrencesOfString("\\\\", withString: "\\")
-            .stringByReplacingOccurrencesOfString("\\r", withString: "\r")
-            .stringByReplacingOccurrencesOfString("\\n", withString: "\n")
+            .replacingOccurrences(of: "\\:", with: ";")
+            .replacingOccurrences(of: "\\s", with: "")
+            .replacingOccurrences(of: "\\\\", with: "\\")
+            .replacingOccurrences(of: "\\r", with: "\r")
+            .replacingOccurrences(of: "\\n", with: "\n")
     }
 }

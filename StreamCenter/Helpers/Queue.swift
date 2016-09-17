@@ -7,13 +7,13 @@
 import Foundation
 
 class Queue<T : Any> {
-    private var array : [T]
+    fileprivate var array : [T]
     
     init() {
         array = [T]()
     }
     
-    func offer(element : T) {
+    func offer(_ element : T) {
         array.append(element)
     }
     

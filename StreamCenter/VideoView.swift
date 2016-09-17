@@ -10,7 +10,7 @@ import Foundation
 
 class VideoView : UIView {
     
-    override class func layerClass() -> AnyClass {
+    override class var layerClass : AnyClass {
         return AVPlayerLayer.classForCoder()
     }
     
@@ -19,12 +19,12 @@ class VideoView : UIView {
         return layer.player
     }
     
-    func setPlayer(player : AVPlayer?) {
+    func setPlayer(_ player : AVPlayer?) {
         let layer = self.layer as! AVPlayerLayer
         layer.player = player
     }
     
-    func setVideoFillMode(fillMode : String) {
+    func setVideoFillMode(_ fillMode : String) {
         let layer = self.layer as! AVPlayerLayer
         layer.videoGravity = fillMode
     }

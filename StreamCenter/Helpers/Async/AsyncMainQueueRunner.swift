@@ -1,12 +1,12 @@
 import Foundation
 
 protocol AsyncMainQueueRunner {
-    func runOnMainQueue(cb: () -> () )
+    func runOnMainQueue(_ cb: @escaping () -> () )
 }
 
 struct AsyncMainQueueRunnerImpl : AsyncMainQueueRunner {
-    func runOnMainQueue(cb: () -> () ) {
-        dispatch_async(dispatch_get_main_queue(),{
+    func runOnMainQueue(_ cb: @escaping () -> () ) {
+        DispatchQueue.main.async(execute: {
             cb()
         })
     }

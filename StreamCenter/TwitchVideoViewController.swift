@@ -11,20 +11,20 @@ enum StreamSourceQuality: String {
 
 class TwitchVideoViewController : UIViewController {
     internal var videoView : VideoView?
-    private var videoPlayer : AVPlayer?
-    private var chatView : TwitchChatView?
+    fileprivate var videoPlayer : AVPlayer?
+    fileprivate var chatView : TwitchChatView?
 
     internal var modalMenu : ModalMenuView?
-    private var modalMenuOptions : [String : [MenuOption]]?
+    fileprivate var modalMenuOptions : [String : [MenuOption]]?
 
     internal var leftSwipe : UISwipeGestureRecognizer!
     internal var rightSwipe : UISwipeGestureRecognizer!
     internal var shortTap : UITapGestureRecognizer!
     internal var longTap : UILongPressGestureRecognizer!
 
-    private var streams : [TwitchStreamVideo]?
-    private var currentStream : TwitchStream?
-    private var currentStreamVideo : TwitchStreamVideo?
+    fileprivate var streams : [TwitchStreamVideo]?
+    fileprivate var currentStream : TwitchStream?
+    fileprivate var currentStreamVideo : TwitchStreamVideo?
 
     internal var twitchApiClient : TwitchApi!
     internal var mainQueueRunner : AsyncMainQueueRunner!
@@ -35,7 +35,7 @@ class TwitchVideoViewController : UIViewController {
         self.twitchApiClient = twitchClient
         self.mainQueueRunner = mainQueueRunner
         
-        self.view.backgroundColor = UIColor.blackColor()
+        self.view.backgroundColor = UIColor.black
         
         //Gestures configuration
         longTap = UILongPressGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.handleLongPress(_:)))
@@ -43,21 +43,21 @@ class TwitchVideoViewController : UIViewController {
         self.view.addGestureRecognizer(longTap)
         
         shortTap = UITapGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.pause))
-        shortTap.allowedPressTypes = [NSNumber(integer: UIPressType.PlayPause.rawValue)]
+        shortTap.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue as Int)]
         self.view.addGestureRecognizer(shortTap)
         
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.handleMenuPress))
-        gestureRecognizer.allowedPressTypes = [UIPressType.Menu.rawValue]
+        gestureRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)]
         gestureRecognizer.cancelsTouchesInView = true
         self.view.addGestureRecognizer(gestureRecognizer)
         
         leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.swipe(_:)))
-        leftSwipe.direction = UISwipeGestureRecognizerDirection.Left
+        leftSwipe.direction = UISwipeGestureRecognizerDirection.left
         self.view.addGestureRecognizer(leftSwipe)
         
         rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(TwitchVideoViewController.swipe(_:)))
-        rightSwipe.direction = UISwipeGestureRecognizerDirection.Right
-        rightSwipe.enabled = false
+        rightSwipe.direction = UISwipeGestureRecognizerDirection.right
+        rightSwipe.isEnabled = false
         self.view.addGestureRecognizer(rightSwipe)
             
         //Modal menu options
@@ -71,15 +71,15 @@ class TwitchVideoViewController : UIViewController {
         ]
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.twitchApiClient.getStreamsForChannel(self.currentStream!.channel.name) {
             (streams, error) in
             
-            if let streams = streams where streams.count > 0 {
+            if let streams = streams , streams.count > 0 {
                 self.streams = streams
                 self.currentStreamVideo = streams[0]
-                let streamAsset = AVURLAsset(URL: self.currentStreamVideo!.url)
+                let streamAsset = AVURLAsset(url: self.currentStreamVideo!.url)
                 let streamItem = AVPlayerItem(asset: streamAsset)
                 
                 self.videoPlayer = AVPlayer(playerItem: streamItem)
@@ -88,14 +88,14 @@ class TwitchVideoViewController : UIViewController {
                     self.initializePlayerView()
                 })
             } else {
-                let alert = UIAlertController(title: "Uh-Oh!", message: "There seems to be an issue with the stream. We're very sorry about that.", preferredStyle: .Alert)
+                let alert = UIAlertController(title: "Uh-Oh!", message: "There seems to be an issue with the stream. We're very sorry about that.", preferredStyle: .alert)
                 
-                alert.addAction(UIAlertAction(title: "Ok", style: .Cancel, handler: { (action) -> Void in
-                    self.dismissViewControllerAnimated(true, completion: nil)
+                alert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: { (action) -> Void in
+                    self.dismiss(animated: true, completion: nil)
                 }))
                 
                 self.mainQueueRunner.runOnMainQueue({ () -> () in
-                    self.presentViewController(alert, animated: true, completion: nil)
+                    self.present(alert, animated: true, completion: nil)
                 })
             }
         }
@@ -107,7 +107,7 @@ class TwitchVideoViewController : UIViewController {
     * Overrides the default method to shut off the chat connection if present
     * and the free video assets
     */
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         
         self.chatView?.stopDisplayingMessages()
         self.chatView?.removeFromSuperview()
@@ -145,7 +145,7 @@ class TwitchVideoViewController : UIViewController {
     func initializeChatView() {
         self.chatView = TwitchChatView(frame: CGRect(x: 0, y: 0, width: 400, height: self.view!.bounds.height), channel: self.currentStream!.channel)
         self.chatView!.startDisplayingMessages()
-        self.chatView?.backgroundColor = UIColor.whiteColor()
+        self.chatView?.backgroundColor = UIColor.white
         self.view.addSubview(self.chatView!)
     }
     
@@ -155,8 +155,8 @@ class TwitchVideoViewController : UIViewController {
     * Handler for the UILongPressGestureRecognizer of the controller
     * Presents the modal menu if it is initialized
     */
-    func handleLongPress(longPressRecognizer: UILongPressGestureRecognizer) {
-        if longPressRecognizer.state == UIGestureRecognizerState.Began {
+    func handleLongPress(_ longPressRecognizer: UILongPressGestureRecognizer) {
+        if longPressRecognizer.state == UIGestureRecognizerState.began {
             if self.modalMenu == nil {
                 modalMenu = ModalMenuView(frame: self.view.bounds,
                     options: self.modalMenuOptions!,
@@ -169,12 +169,12 @@ class TwitchVideoViewController : UIViewController {
                 return
             }
             
-            if modalMenu.isDescendantOfView(self.view) {
+            if modalMenu.isDescendant(of: self.view) {
                 dismissMenu()
             } else {
                 modalMenu.alpha = 0
                 self.view.addSubview(self.modalMenu!)
-                UIView.animateWithDuration(0.5, animations: { () -> Void in
+                UIView.animate(withDuration: 0.5, animations: { () -> Void in
                     self.modalMenu?.alpha = 1
                     self.view.setNeedsFocusUpdate()
                 })
@@ -192,14 +192,14 @@ class TwitchVideoViewController : UIViewController {
         if dismissMenu() {
             return
         }
-        self.dismissViewControllerAnimated(true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
     
     func dismissMenu() -> Bool {
         if let modalMenu = modalMenu {
             if self.view.subviews.contains(modalMenu) {
                 //bkirchner: for some reason when i try to animate the menu fading away, it just goes to the homescreen - really odd
-                UIView.animateWithDuration(0.5, animations: { () -> Void in
+                UIView.animate(withDuration: 0.5, animations: { () -> Void in
                     modalMenu.alpha = 0
                 }, completion: { (finished) -> Void in
                     Logger.Debug("Fade away animation finished: \(finished)")
@@ -220,7 +220,7 @@ class TwitchVideoViewController : UIViewController {
     * Handler for the chat option from the modal menu
     * Displays or remove the chat view
     */
-    func handleChatOnOff(sender : MenuItemView?) {
+    func handleChatOnOff(_ sender : MenuItemView?) {
         //NOTE(Olivier) : 400 width reduction at 16:9 is 225 height reduction
         self.mainQueueRunner.runOnMainQueue({ () -> () in
             if let menuItem = sender {
@@ -261,37 +261,36 @@ class TwitchVideoViewController : UIViewController {
             self.view.addSubview(self.chatView!)
         }
         
-        rightSwipe.enabled = true
-        leftSwipe.enabled = false
+        rightSwipe.isEnabled = true
+        leftSwipe.isEnabled = false
         
         //animate the showing of the chat view
-        UIView.animateWithDuration(0.5) { () -> Void in
+        UIView.animate(withDuration: 0.5, animations: { () -> Void in
             self.chatView!.frame = CGRect(x: self.view.bounds.width - 400, y: 0, width: 400, height: self.view!.bounds.height)
-            if let videoView = self.videoView, frame = frame {
+            if let videoView = self.videoView, let frame = frame {
                 videoView.frame = frame
             }
-        }
+        }) 
     }
     
     func hideChat() {
-        
-        rightSwipe.enabled = false
-        leftSwipe.enabled = true
+        rightSwipe.isEnabled = false
+        leftSwipe.isEnabled = true
         
         //animate the hiding of the chat view
-        UIView.animateWithDuration(0.5, animations: { () -> Void in
+        UIView.animate(withDuration: 0.5, animations: { () -> Void in
             self.videoView!.frame = self.view.frame
-            self.chatView!.frame.origin.x = CGRectGetMaxX(self.view.frame)
-        }) { (finished) -> Void in
+            self.chatView!.frame.origin.x = self.view.frame.maxX
+        }, completion: { (finished) -> Void in
                 //The chat view
                 self.chatView!.stopDisplayingMessages()
                 self.chatView!.removeFromSuperview()
                 self.chatView = nil
-        }
+        }) 
     }
     
-    func handleQualityChange(sender : MenuItemView?) {
-        if let text = sender?.title?.text, quality = StreamSourceQuality(rawValue: text) {
+    func handleQualityChange(_ sender : MenuItemView?) {
+        if let text = sender?.title?.text, let quality = StreamSourceQuality(rawValue: text) {
             var qualityIdentifier = "chunked"
             switch quality {
             case .Source:
@@ -307,9 +306,9 @@ class TwitchVideoViewController : UIViewController {
                 for stream in streams {
                     if stream.quality == qualityIdentifier {
                         currentStreamVideo = stream
-                        let streamAsset = AVURLAsset(URL: stream.url)
+                        let streamAsset = AVURLAsset(url: stream.url as URL)
                         let streamItem = AVPlayerItem(asset: streamAsset)
-                        self.videoPlayer?.replaceCurrentItemWithPlayerItem(streamItem)
+                        self.videoPlayer?.replaceCurrentItem(with: streamItem)
                         dismissMenu()
                         return
                     }
@@ -326,9 +325,9 @@ class TwitchVideoViewController : UIViewController {
             } else {
                 if let currentVideo = currentStreamVideo {
                     //do this to bring it back in sync
-                    let streamAsset = AVURLAsset(URL: currentVideo.url)
+                    let streamAsset = AVURLAsset(url: currentVideo.url as URL)
                     let streamItem = AVPlayerItem(asset: streamAsset)
-                    player.replaceCurrentItemWithPlayerItem(streamItem)
+                    player.replaceCurrentItem(with: streamItem)
                 }
                 videoView?.alpha = 1.0
                 player.play()
@@ -336,9 +335,9 @@ class TwitchVideoViewController : UIViewController {
         }
     }
     
-    func swipe(recognizer: UISwipeGestureRecognizer) {
-        if recognizer.state == .Ended {
-            if recognizer.direction == .Left {
+    func swipe(_ recognizer: UISwipeGestureRecognizer) {
+        if recognizer.state == .ended {
+            if recognizer.direction == .left {
                 showChat()
             } else {
                 hideChat()

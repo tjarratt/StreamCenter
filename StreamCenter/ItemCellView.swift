@@ -15,19 +15,19 @@ protocol CellItem {
     var subtitle: String { get }
     var bannerString: String? { get }
     var image: UIImage? { get }
-    mutating func setImage(image: UIImage)
+    mutating func setImage(_ image: UIImage)
 }
 
 class ItemCellView: UICollectionViewCell {
     internal static let CELL_IDENTIFIER : String = "kItemCellView"
     internal static let LABEL_HEIGHT : CGFloat = 40
     
-    private var representedItem : CellItem?
-    private var image : UIImage?
-    private var imageView : UIImageView!
-    private var activityIndicator : UIActivityIndicatorView!
-    private var titleLabel : ScrollingLabel!
-    private var subtitleLabel : UILabel!
+    fileprivate var representedItem : CellItem?
+    fileprivate var image : UIImage?
+    fileprivate var imageView : UIImageView!
+    fileprivate var activityIndicator : UIActivityIndicatorView!
+    fileprivate var titleLabel : ScrollingLabel!
+    fileprivate var subtitleLabel : UILabel!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -38,11 +38,11 @@ class ItemCellView: UICollectionViewCell {
         //we don't need to have this next line because we are turning on the 'adjustsImageWhenAncestorFocused' therefore we can't clip to bounds, and the corner radius has no effect if we aren't clipping
         self.imageView.layer.cornerRadius = 10
         self.imageView.backgroundColor = UIColor(white: 0.25, alpha: 0.7)
-        self.imageView.contentMode = UIViewContentMode.ScaleAspectFill
+        self.imageView.contentMode = UIViewContentMode.scaleAspectFill
         
         self.activityIndicator = UIActivityIndicatorView(frame: imageViewFrame)
         self.activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge
+        self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.whiteLarge
         self.activityIndicator.startAnimating()
         
         self.titleLabel = ScrollingLabel(scrollSpeed: 0.5)
@@ -51,24 +51,27 @@ class ItemCellView: UICollectionViewCell {
         self.subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         self.titleLabel.alpha = 0.5
         self.subtitleLabel.alpha = 0.5
-        self.titleLabel.font = UIFont.systemFontOfSize(30, weight: UIFontWeightSemibold)
-        self.subtitleLabel.font = UIFont.systemFontOfSize(30, weight: UIFontWeightThin)
-        self.titleLabel.textColor = UIColor.whiteColor()
-        self.subtitleLabel.textColor = UIColor.whiteColor()
+        self.titleLabel.font = UIFont.systemFont(ofSize: 30, weight: UIFontWeightSemibold)
+        self.subtitleLabel.font = UIFont.systemFont(ofSize: 30, weight: UIFontWeightThin)
+        self.titleLabel.textColor = UIColor.white
+        self.subtitleLabel.textColor = UIColor.white
         
         self.imageView.addSubview(self.activityIndicator)
         self.contentView.addSubview(self.imageView)
         self.contentView.addSubview(titleLabel)
         self.contentView.addSubview(subtitleLabel)
         
-        let viewDict = ["image" : imageView, "title" : titleLabel, "subtitle" : subtitleLabel, "imageGuide" : imageView.focusedFrameGuide]
+        let viewDict = ["image" : imageView,
+                        "title" : titleLabel,
+                        "subtitle" : subtitleLabel,
+                        "imageGuide" : imageView.focusedFrameGuide]
         
-        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[image]|", options: [], metrics: nil, views: viewDict))
-        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[title]|", options: [], metrics: nil, views: viewDict))
-        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[subtitle]|", options: [], metrics: nil, views: viewDict))
-        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[image]", options: [], metrics: nil, views: viewDict))
+        self.contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[image]|", options: [], metrics: nil, views: viewDict))
+        self.contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[title]|", options: [], metrics: nil, views: viewDict))
+        self.contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[subtitle]|", options: [], metrics: nil, views: viewDict))
+        self.contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[image]", options: [], metrics: nil, views: viewDict))
         
-        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:[imageGuide]-5-[title(\(ItemCellView.LABEL_HEIGHT))]-5-[subtitle(\(ItemCellView.LABEL_HEIGHT))]|", options: [], metrics: nil, views: viewDict))
+        self.contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:[imageGuide]-5-[title(\(ItemCellView.LABEL_HEIGHT))]-5-[subtitle(\(ItemCellView.LABEL_HEIGHT))]|", options: [], metrics: nil, views: viewDict))
         
         self.imageView.addCenterConstraints(toView: self.activityIndicator)
         
@@ -94,7 +97,7 @@ class ItemCellView: UICollectionViewCell {
         self.subtitleLabel.text = ""
         
         self.activityIndicator = UIActivityIndicatorView(frame: self.imageView.frame)
-        self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.WhiteLarge
+        self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.whiteLarge
         self.activityIndicator.startAnimating()
         
         self.imageView.addSubview(self.activityIndicator!)
@@ -106,7 +109,7 @@ class ItemCellView: UICollectionViewCell {
     * Downloads the image from the actual game and assigns it to the image view
     * Removes the loading indicator on download callback success
     */
-    private func assignImageAndDisplay() {
+    fileprivate func assignImageAndDisplay() {
         self.downloadImageWithSize(self.imageView!.bounds.size) {
             (image, error) in
             
@@ -117,7 +120,7 @@ class ItemCellView: UICollectionViewCell {
             }
             
             
-            dispatch_async(dispatch_get_main_queue(),{
+            DispatchQueue.main.async(execute: {
                 if self.activityIndicator != nil  {
                     self.activityIndicator?.removeFromSuperview()
                     self.activityIndicator = nil
@@ -134,24 +137,23 @@ class ItemCellView: UICollectionViewCell {
     * Download an image from twitch server with the required size
     * Passes the downloaded image to a defined completion handler
     */
-    private func downloadImageWithSize(size : CGSize, completionHandler : (image : UIImage?, error : NSError?) -> ()) {
+    fileprivate func downloadImageWithSize(_ size : CGSize, completionHandler : @escaping (_ image : UIImage?, _ error : NSError?) -> ()) {
         if let image = representedItem?.image {
-            completionHandler(image: image, error: nil)
+            completionHandler(image, nil)
             return
         }
         if let imgUrlTemplate = representedItem?.urlTemplate {
-            let imgUrlString = imgUrlTemplate.stringByReplacingOccurrencesOfString("{width}", withString: "\(Int(size.width))")
-                .stringByReplacingOccurrencesOfString("{height}", withString: "\(Int(size.height))")
-            Alamofire.request(.GET, imgUrlString).response() {
-                (_, _, data, error) in
-                
-                guard let data = data, image = UIImage(data: data) else {
-                    completionHandler(image: nil, error: nil)
+            let imgUrlString = imgUrlTemplate.replacingOccurrences(of: "{width}", with: "\(Int(size.width))")
+                .replacingOccurrences(of: "{height}", with: "\(Int(size.height))")
+            let request = Alamofire.request(imgUrlString)
+            request.response(completionHandler: { (response) in
+                guard let data = response.data, let image = UIImage(data: data) else {
+                    completionHandler(nil, nil)
                     return
                 }
                 self.representedItem?.setImage(image)
-                completionHandler(image: image, error: nil)
-            }
+                completionHandler(image, nil)
+            })
         }
     }
     
@@ -161,8 +163,8 @@ class ItemCellView: UICollectionViewCell {
     * Responds to the focus update by either growing or shrinking
     *
     */
-    override func didUpdateFocusInContext(context: UIFocusUpdateContext, withAnimationCoordinator coordinator: UIFocusAnimationCoordinator) {
-        super.didUpdateFocusInContext(context, withAnimationCoordinator: coordinator)
+    override func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
+        super.didUpdateFocus(in: context, with: coordinator)
         if(context.nextFocusedView == self){
             coordinator.addCoordinatedAnimations({
                 self.titleLabel.alpha = 1
@@ -204,7 +206,7 @@ class ItemCellView: UICollectionViewCell {
         return self.representedItem
     }
     
-    func setRepresentedItem(item : CellItem) {
+    func setRepresentedItem(_ item : CellItem) {
         self.representedItem = item
         titleLabel.text = item.title
         subtitleLabel.text = item.subtitle

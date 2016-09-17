@@ -8,7 +8,7 @@ import UIKit
 
 class TwitchGamesViewController : LoadingViewController {
 
-    private let LOADING_BUFFER = 20
+    fileprivate let LOADING_BUFFER = 20
     
     override var NUM_COLUMNS: Int {
         get {
@@ -28,10 +28,10 @@ class TwitchGamesViewController : LoadingViewController {
         }
     }
     
-    private var searchField: UITextField!
-    private var games = [TwitchGame]()
-    private var twitchButton: UIButton?
-    private var twitchAPIClient : TwitchApi = TwitchApiClient.init() // FIXME: should be injected
+    fileprivate var searchField: UITextField!
+    fileprivate var games = [TwitchGame]()
+    fileprivate var twitchButton: UIButton?
+    fileprivate var twitchAPIClient : TwitchApi = TwitchApiClient.init() // FIXME: should be injected
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,7 +39,7 @@ class TwitchGamesViewController : LoadingViewController {
         configureViews()
     }
 
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         loadContent()
@@ -52,7 +52,7 @@ class TwitchGamesViewController : LoadingViewController {
             (games, error) in
             
             guard let games = games else {
-                dispatch_async(dispatch_get_main_queue(), {
+                DispatchQueue.main.async(execute: {
                     self.removeLoadingView()
                     self.displayErrorView("Error loading game list.\nPlease check your internet connection.")
                 })
@@ -60,7 +60,7 @@ class TwitchGamesViewController : LoadingViewController {
             }
             
             self.games = games
-            dispatch_async(dispatch_get_main_queue(), {
+            DispatchQueue.main.async(execute: {
                 self.removeLoadingView()
                 self.collectionView.reloadData()
             })
@@ -68,22 +68,22 @@ class TwitchGamesViewController : LoadingViewController {
     }
     
     func configureViews() {
-        self.searchField = UITextField(frame: CGRectZero)
+        self.searchField = UITextField(frame: CGRect.zero)
         self.searchField.translatesAutoresizingMaskIntoConstraints = false
         self.searchField.placeholder = "Search Games or Streams"
         self.searchField.delegate = self
-        self.searchField.textAlignment = .Center
+        self.searchField.textAlignment = .center
 
         if TokenHelper.getTwitchToken() == nil {
-            self.twitchButton = UIButton(type: .System)
+            self.twitchButton = UIButton(type: .system)
             self.twitchButton?.translatesAutoresizingMaskIntoConstraints = false
-            self.twitchButton?.setTitleColor(UIColor.darkGrayColor(), forState: .Normal)
-            self.twitchButton?.setTitle("Authenticate", forState: .Normal)
-            self.twitchButton?.addTarget(self, action: #selector(TwitchGamesViewController.authorizeUser), forControlEvents: .PrimaryActionTriggered)
+            self.twitchButton?.setTitleColor(UIColor.darkGray, for: UIControlState())
+            self.twitchButton?.setTitle("Authenticate", for: UIControlState())
+            self.twitchButton?.addTarget(self, action: #selector(TwitchGamesViewController.authorizeUser), for: .primaryActionTriggered)
         }
         
         let imageView = UIImageView(image: UIImage(named: "twitch"))
-        imageView.contentMode = .ScaleAspectFit
+        imageView.contentMode = .scaleAspectFit
         
         super.configureViews("Top Games", centerView: imageView, leftView: self.searchField, rightView: nil)
     }
@@ -91,7 +91,7 @@ class TwitchGamesViewController : LoadingViewController {
     func authorizeUser() {
         let qrController = TwitchAuthViewController()
         qrController.delegate = self
-        presentViewController(qrController, animated: true, completion: nil)
+        present(qrController, animated: true, completion: nil)
     }
     
     override func reloadContent() {
@@ -103,28 +103,28 @@ class TwitchGamesViewController : LoadingViewController {
         self.twitchAPIClient.getTopGamesWithOffset(games.count, limit: LOADING_BUFFER) {
             (games, error) in
             
-            guard let games = games where games.count > 0 else {
+            guard let games = games , games.count > 0 else {
                 return
             }
             
-            var paths = [NSIndexPath]()
+            var paths = [IndexPath]()
             
             let filteredGames = games.filter({
                 let gameId = $0.id
-                if let _ = self.games.indexOf({$0.id == gameId}) {
+                if let _ = self.games.index(where: {$0.id == gameId}) {
                     return false
                 }
                 return true
             })
             
             for i in 0..<filteredGames.count {
-                paths.append(NSIndexPath(forItem: i + self.games.count, inSection: 0))
+                paths.append(IndexPath(item: i + self.games.count, section: 0))
             }
             
             self.collectionView.performBatchUpdates({
-                self.games.appendContentsOf(filteredGames)
+                self.games.append(contentsOf: filteredGames)
                 
-                self.collectionView.insertItemsAtIndexPaths(paths)
+                self.collectionView.insertItems(at: paths)
                 
                 }, completion: nil)
         }
@@ -136,7 +136,7 @@ class TwitchGamesViewController : LoadingViewController {
         }
     }
     
-    override func getItemAtIndex(index: Int) -> CellItem {
+    override func getItemAtIndex(_ index: Int) -> CellItem {
         return games[index]
     }
 }
@@ -148,11 +148,11 @@ class TwitchGamesViewController : LoadingViewController {
 
 extension TwitchGamesViewController {
     
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        let selectedGame = games[indexPath.row]
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: IndexPath) {
+        let selectedGame = games[(indexPath as NSIndexPath).row]
         let streamsViewController = TwitchStreamsViewController(game: selectedGame)
         
-        self.presentViewController(streamsViewController, animated: true, completion: nil)
+        self.present(streamsViewController, animated: true, completion: nil)
     }
     
 }
@@ -163,8 +163,8 @@ extension TwitchGamesViewController {
 
 extension TwitchGamesViewController : UITextFieldDelegate {
     
-    func textFieldDidEndEditing(textField: UITextField) {
-        guard let term = textField.text where !term.isEmpty else {
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        guard let term = textField.text , !term.isEmpty else {
             return
         }
 
@@ -173,7 +173,7 @@ extension TwitchGamesViewController : UITextFieldDelegate {
             twitchClient: self.twitchAPIClient,
             mainQueueRunner: AsyncMainQueueRunnerImpl()
         )
-        presentViewController(searchViewController, animated: true, completion: nil)
+        present(searchViewController, animated: true, completion: nil)
     }
 }
 
@@ -183,12 +183,12 @@ extension TwitchGamesViewController : UITextFieldDelegate {
 
 extension TwitchGamesViewController: QRCodeDelegate {
     
-    func qrCodeViewControllerFinished(success: Bool, data: [String : AnyObject]?) {
-        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+    func qrCodeViewControllerFinished(_ success: Bool, data: [String : AnyObject]?) {
+        DispatchQueue.main.async { () -> Void in
             if success {
                 self.twitchButton?.removeFromSuperview()
             }
-            self.dismissViewControllerAnimated(true, completion: nil)
+            self.dismiss(animated: true, completion: nil)
         }
     }
 }

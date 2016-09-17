@@ -8,12 +8,12 @@
 
 import Foundation
 
-extension NSData {
-    func hasSuffix(bytes bytes: [UInt8]) -> Bool {
-        if self.length < bytes.count { return false }
-        let ptr = UnsafePointer<UInt8>(self.bytes)
-        for (i, byte) in bytes.enumerate() {
-            if ptr[self.length - bytes.count + i] != byte {
+extension Data {
+    func hasSuffix(bytes: [UInt8]) -> Bool {
+        if self.count < bytes.count { return false }
+        let ptr = (self as NSData).bytes.bindMemory(to: UInt8.self, capacity: self.count)
+        for (i, byte) in bytes.enumerated() {
+            if ptr[self.count - bytes.count + i] != byte {
                 return false
             }
         }
@@ -22,14 +22,14 @@ extension NSData {
 }
 
 extension NSMutableData {
-    func appendBytes(bytes bytes: [UInt8]) {
+    func appendBytes(bytes: [UInt8]) {
         if bytes.count > 0 {
-            self.appendBytes(UnsafePointer<UInt8>(bytes), length: bytes.count)
+            self.append(UnsafePointer<UInt8>(bytes), length: bytes.count)
         }
     }
     
-    func replaceBytesInRange(range : NSRange, bytes : [UInt8]) {
+    func replaceBytesInRange(_ range : NSRange, bytes : [UInt8]) {
         let ptr = UnsafePointer<UInt8>(bytes)
-        self.replaceBytesInRange(range, withBytes: ptr, length: bytes.count)
+        self.replaceBytes(in: range, withBytes: ptr, length: bytes.count)
     }
 }

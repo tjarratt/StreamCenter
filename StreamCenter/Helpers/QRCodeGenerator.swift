@@ -11,7 +11,7 @@ import UIKit
 struct QRCodeGenerator {
     
     static func generateQRCode(withString qrString: String, clearBackground clearBg: Bool = false) -> UIImage? {
-        let data = qrString.dataUsingEncoding(NSUTF8StringEncoding)
+        let data = qrString.data(using: String.Encoding.utf8)
         
         guard let filter = CIFilter(name: "CIQRCodeGenerator") else {
             return nil
@@ -25,7 +25,7 @@ struct QRCodeGenerator {
         }
         
         if !clearBg {
-            return UIImage(CIImage: ciImg)
+            return UIImage(ciImage: ciImg)
         }
         
         guard let bgFilter = CIFilter(name: "CIFalseColor") else {
@@ -40,7 +40,7 @@ struct QRCodeGenerator {
             return nil
         }
         
-        return UIImage(CIImage: clearImage)
+        return UIImage(ciImage: clearImage)
     }
     
 }

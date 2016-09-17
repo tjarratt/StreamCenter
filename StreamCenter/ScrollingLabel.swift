@@ -12,7 +12,7 @@ import QuartzCore
 
 class ScrollingLabel: UIView {
     
-    private var scrollSpeed = 0.5 {
+    fileprivate var scrollSpeed = 0.5 {
         didSet {
             if scrollSpeed > 1 {
                 scrollSpeed = 1
@@ -21,31 +21,31 @@ class ScrollingLabel: UIView {
             }
         }
     }
-    private var textLayer = CATextLayer()
-    private var gradientLayer = CAGradientLayer()
-    private var isScrolling = false
+    fileprivate var textLayer = CATextLayer()
+    fileprivate var gradientLayer = CAGradientLayer()
+    fileprivate var isScrolling = false
     
-    private var offset = CGFloat(0) {
+    fileprivate var offset = CGFloat(0) {
         didSet {
             self.setNeedsDisplay()
         }
     }
     
     override init(frame: CGRect) {
-        self.font = UIFont.systemFontOfSize(17)
-        self.textColor = UIColor.blackColor()
+        self.font = UIFont.systemFont(ofSize: 17)
+        self.textColor = UIColor.black
         super.init(frame: frame)
         self.setupLayers()
     }
     
     convenience init(scrollSpeed speed: Double) {
-        self.init(frame: CGRectZero)
+        self.init(frame: CGRect.zero)
         scrollSpeed = speed
     }
     
     required init?(coder aDecoder: NSCoder) {
-        self.font = UIFont.systemFontOfSize(17)
-        self.textColor = UIColor.blackColor()
+        self.font = UIFont.systemFont(ofSize: 17)
+        self.textColor = UIColor.black
         super.init(coder: aDecoder)
         self.setupLayers()
     }
@@ -55,28 +55,28 @@ class ScrollingLabel: UIView {
         
         self.textLayer.string = "Hello World"
         self.textLayer.fontSize = 30
-        self.textLayer.foregroundColor = UIColor.whiteColor().CGColor
+        self.textLayer.foregroundColor = UIColor.white.cgColor
         self.textLayer.frame = self.bounds
         self.textLayer.frame.size.width = 500
-        self.textLayer.wrapped = false
+        self.textLayer.isWrapped = false
         self.textLayer.alignmentMode = kCAAlignmentLeft
         self.layer.addSublayer(self.textLayer)
         
         self.gradientLayer.colors = [
-            UIColor(white: 0.4, alpha: 0).CGColor,
-            UIColor(white: 0.4, alpha: 0.9).CGColor,
-            UIColor.whiteColor().CGColor,
-            UIColor(white: 0.4, alpha: 0.9).CGColor,
-            UIColor(white: 0.4, alpha: 0).CGColor
+            UIColor(white: 0.4, alpha: 0).cgColor,
+            UIColor(white: 0.4, alpha: 0.9).cgColor,
+            UIColor.white.cgColor,
+            UIColor(white: 0.4, alpha: 0.9).cgColor,
+            UIColor(white: 0.4, alpha: 0).cgColor
         ]
         self.gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
         self.gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
         self.gradientLayer.locations = [
-            NSNumber(double: 0.0),
-            NSNumber(double: 0.05),
-            NSNumber(double: 0.5),
-            NSNumber(double: 0.95),
-            NSNumber(double: 1.0),
+            NSNumber(value: 0.0 as Double),
+            NSNumber(value: 0.05 as Double),
+            NSNumber(value: 0.5 as Double),
+            NSNumber(value: 0.95 as Double),
+            NSNumber(value: 1.0 as Double),
         ]
     }
     
@@ -105,9 +105,9 @@ class ScrollingLabel: UIView {
         animation.duration = 10 * (1.1 - scrollSpeed)
         animation.repeatCount = Float.infinity
         animation.autoreverses = true
-        animation.fromValue = NSValue(CGPoint: initialPoint)
-        animation.toValue = NSValue(CGPoint: CGPoint(x: initialPoint.x - (moveAmount + 5), y: initialPoint.y))
-        self.textLayer.addAnimation(animation, forKey: nil)
+        animation.fromValue = NSValue(cgPoint: initialPoint)
+        animation.toValue = NSValue(cgPoint: CGPoint(x: initialPoint.x - (moveAmount + 5), y: initialPoint.y))
+        self.textLayer.add(animation, forKey: nil)
         self.layer.mask = self.gradientLayer
         isScrolling = true
     }
@@ -129,14 +129,14 @@ class ScrollingLabel: UIView {
     
     var font: UIFont {
         didSet {
-            textLayer.font = font.fontName
+            textLayer.font = font.fontName as CFTypeRef?
             textLayer.fontSize = font.pointSize
         }
     }
     
     var textColor: UIColor {
         didSet {
-            textLayer.foregroundColor = textColor.CGColor
+            textLayer.foregroundColor = textColor.cgColor
         }
     }
     

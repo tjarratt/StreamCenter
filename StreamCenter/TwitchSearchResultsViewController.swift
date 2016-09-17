@@ -1,19 +1,19 @@
 import UIKit
 
 private enum SearchType {
-    case Game
-    case Stream
+    case game
+    case stream
 }
 
 class TwitchSearchResultsViewController: LoadingViewController {
     
-    private let LOADING_BUFFER = 20
+    fileprivate let LOADING_BUFFER = 20
     
     override var NUM_COLUMNS: Int {
         switch searchType {
-        case .Game:
+        case .game:
             return 5
-        case .Stream:
+        case .stream:
             return 3
         }
     }
@@ -21,9 +21,9 @@ class TwitchSearchResultsViewController: LoadingViewController {
     override var ITEMS_INSETS_X: CGFloat {
         get {
             switch searchType {
-            case .Game:
+            case .game:
                 return 25
-            case .Stream:
+            case .stream:
                 return 45
             }
         }
@@ -32,23 +32,23 @@ class TwitchSearchResultsViewController: LoadingViewController {
     override var HEIGHT_RATIO: CGFloat {
         get {
             switch searchType {
-            case .Game:
+            case .game:
                 return 1.39705882353
-            case .Stream:
+            case .stream:
                 return 0.5625
             }
         }
     }
 
-    private var games = [TwitchGame]()
-    private var streams = [TwitchStream]()
+    fileprivate var games = [TwitchGame]()
+    fileprivate var streams = [TwitchStream]()
 
     internal var searchTypeControl: UISegmentedControl!
-    private var searchType = SearchType.Game
+    fileprivate var searchType = SearchType.game
 
-    private var searchTerm: String!
-    private var twitchAPIClient : TwitchApi!
-    private var mainQueueRunner : AsyncMainQueueRunner!
+    fileprivate var searchTerm: String!
+    fileprivate var twitchAPIClient : TwitchApi!
+    fileprivate var mainQueueRunner : AsyncMainQueueRunner!
     
     convenience init(searchTerm term: String, twitchClient : TwitchApi, mainQueueRunner : AsyncMainQueueRunner) {
         self.init(nibName: nil, bundle: nil)
@@ -62,7 +62,7 @@ class TwitchSearchResultsViewController: LoadingViewController {
         self.configureViews()
     }
 
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         if self.streams.count == 0 || self.games.count == 0 {
@@ -105,15 +105,15 @@ class TwitchSearchResultsViewController: LoadingViewController {
         }
     }
     
-    private func configureViews() {
+    fileprivate func configureViews() {
         self.searchTypeControl = UISegmentedControl(items: ["Games", "Streams"])
         self.searchTypeControl.translatesAutoresizingMaskIntoConstraints = false
         self.searchTypeControl.selectedSegmentIndex = 0
-        self.searchTypeControl.setTitleTextAttributes([NSForegroundColorAttributeName : UIColor(white: 0.45, alpha: 1)], forState: .Normal)
+        self.searchTypeControl.setTitleTextAttributes([NSForegroundColorAttributeName : UIColor(white: 0.45, alpha: 1)], for: UIControlState())
         self.searchTypeControl.addTarget(
             self,
             action: #selector(TwitchSearchResultsViewController.changedSearchType(_:forEvent:)),
-            forControlEvents: .ValueChanged
+            for: .valueChanged
         )
         
         super.configureViews("Search Results - \(searchTerm)", centerView: nil, leftView: self.searchTypeControl, rightView: nil)
@@ -124,12 +124,12 @@ class TwitchSearchResultsViewController: LoadingViewController {
         super.reloadContent()
     }
     
-    func changedSearchType(control: UISegmentedControl, forEvent: UIEvent) {
+    func changedSearchType(_ control: UISegmentedControl, forEvent: UIEvent) {
         switch control.selectedSegmentIndex {
         case 0:
-            searchType = .Game
+            searchType = .game
         case 1:
-            searchType = .Stream
+            searchType = .stream
         default:
             return
         }
@@ -137,29 +137,29 @@ class TwitchSearchResultsViewController: LoadingViewController {
     }
     
     override func loadMore() {
-        if searchType == .Stream {
+        if searchType == .stream {
             self.twitchAPIClient.getStreamsWithSearchTerm(self.searchTerm, offset: self.streams.count, limit: LOADING_BUFFER, completionHandler: { (streams, error) -> () in
                 guard let streams = streams else {
                     return
                 }
-                var paths = [NSIndexPath]()
+                var paths = [IndexPath]()
                 
                 let filteredStreams = streams.filter({
                     let streamId = $0.id
-                    if let _ = self.streams.indexOf({$0.id == streamId}) {
+                    if let _ = self.streams.index(where: {$0.id == streamId}) {
                         return false
                     }
                     return true
                 })
                 
                 for i in 0..<filteredStreams.count {
-                    paths.append(NSIndexPath(forItem: i + self.streams.count, inSection: 0))
+                    paths.append(IndexPath(item: i + self.streams.count, section: 0))
                 }
                 
                 self.collectionView.performBatchUpdates({
-                    self.streams.appendContentsOf(filteredStreams)
+                    self.streams.append(contentsOf: filteredStreams)
                     
-                    self.collectionView.insertItemsAtIndexPaths(paths)
+                    self.collectionView.insertItems(at: paths)
                     
                     }, completion: nil)
             })
@@ -169,19 +169,19 @@ class TwitchSearchResultsViewController: LoadingViewController {
     override var itemCount: Int {
         get {
             switch searchType {
-            case .Game:
+            case .game:
                 return games.count
-            case .Stream:
+            case .stream:
                 return streams.count
             }
         }
     }
 
-    override func getItemAtIndex(index: Int) -> CellItem {
+    override func getItemAtIndex(_ index: Int) -> CellItem {
         switch searchType {
-        case .Game:
+        case .game:
             return games[index]
-        case .Stream:
+        case .stream:
             return streams[index]
         }
     }
@@ -194,21 +194,21 @@ class TwitchSearchResultsViewController: LoadingViewController {
 
 extension TwitchSearchResultsViewController {
     
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: IndexPath) {
         switch searchType {
-        case .Game:
-            let selectedGame = games[indexPath.row]
+        case .game:
+            let selectedGame = games[(indexPath as NSIndexPath).row]
             let streamViewController = TwitchStreamsViewController(game: selectedGame)
-            self.presentViewController(streamViewController, animated: true, completion: nil)
-        case .Stream:
-            let selectedStream = streams[indexPath.row]
+            self.present(streamViewController, animated: true, completion: nil)
+        case .stream:
+            let selectedStream = streams[(indexPath as NSIndexPath).row]
             let videoViewController = TwitchVideoViewController(
                 stream: selectedStream,
                 twitchClient: TwitchApiClient.init(),
                 mainQueueRunner: AsyncMainQueueRunnerImpl.init()
             )
             
-            self.presentViewController(videoViewController, animated: true, completion: nil)
+            self.present(videoViewController, animated: true, completion: nil)
         }
     }
     

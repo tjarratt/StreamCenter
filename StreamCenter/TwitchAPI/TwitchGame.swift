@@ -15,7 +15,7 @@ struct TwitchGame: CellItem {
     let name : String!
     let thumbnails : [String : String]!
     let logos : [String : String]!
-    private var mImage: UIImage?
+    fileprivate var mImage: UIImage?
     
     init(id : Int, viewers : Int, channels : Int, name : String, thumbnails : [String : String], logos : [String : String]) {
         self.id = id
@@ -127,7 +127,7 @@ struct TwitchGame: CellItem {
         }
     }
     
-    mutating func setImage(image: UIImage) {
+    mutating func setImage(_ image: UIImage) {
         mImage = image
     }
 }

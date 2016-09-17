@@ -9,7 +9,7 @@ import Foundation
 
 protocol LoadController {
     var itemCount: Int { get }
-    func getItemAtIndex(index: Int) -> CellItem
+    func getItemAtIndex(_ index: Int) -> CellItem
 }
 
 //NOTE(Olivier):
@@ -45,7 +45,7 @@ class LoadingViewController : UIViewController, LoadController {
     
     internal var loadingView : LoadingView?
     internal var errorView : ErrorView?
-    private var reloadLabel : UILabel?
+    fileprivate var reloadLabel : UILabel?
     
     override func viewDidLoad() {
         self.view.backgroundColor = UIColor(white: 0.4, alpha: 1)
@@ -57,7 +57,7 @@ class LoadingViewController : UIViewController, LoadController {
     * Initializes a loading view in the center of the screen and displays it
     *
     */
-    func displayLoadingView(loading: String = "Loading...")  {
+    func displayLoadingView(_ loading: String = "Loading...")  {
         self.loadingView = LoadingView(frame: CGRect(x: 0, y: 0, width: self.view.bounds.width/5, height: self.view.bounds.height/5), text: loading)
         self.loadingView?.center = self.view.center
         self.view.addSubview(self.loadingView!)
@@ -82,18 +82,18 @@ class LoadingViewController : UIViewController, LoadController {
     * Initializes an error view in the center of the screen and displays it
     *
     */
-    func displayErrorView(title : String) {
+    func displayErrorView(_ title : String) {
         self.errorView = ErrorView(dimension: 450, andTitle: title)
         self.errorView?.center = self.view.center
         self.view.addSubview(self.errorView!)
         
         self.reloadLabel = UILabel()
         self.reloadLabel?.text = "Press and hold on your remote to reload the content."
-        self.reloadLabel?.font = self.reloadLabel?.font.fontWithSize(25)
+        self.reloadLabel?.font = self.reloadLabel?.font.withSize(25)
         self.reloadLabel?.sizeToFit()
-        self.reloadLabel?.center = CGPoint(x: CGRectGetMidX(self.errorView!.frame), y: CGRectGetMaxY(self.errorView!.frame))
+        self.reloadLabel?.center = CGPoint(x: self.errorView!.frame.midX, y: self.errorView!.frame.maxY)
         self.reloadLabel?.center.y += 10
-        self.reloadLabel?.textColor = UIColor.whiteColor()
+        self.reloadLabel?.textColor = UIColor.white
         self.view.addSubview(self.reloadLabel!)
         
         //Gestures configuration
@@ -125,41 +125,40 @@ class LoadingViewController : UIViewController, LoadController {
     * Removes the error view if existant
     *
     */
-    func configureViews(topBarTitle: String, centerView: UIView? = nil, leftView: UIView? = nil, rightView: UIView? = nil) {
+    func configureViews(_ topBarTitle: String, centerView: UIView? = nil, leftView: UIView? = nil, rightView: UIView? = nil) {
         
         //do the top bar first
-        self.topBar = TopBarView(frame: CGRectZero, withMainTitle: topBarTitle, centerView: centerView, leftView: leftView, rightView: rightView)
+        self.topBar = TopBarView(frame: CGRect.zero, withMainTitle: topBarTitle, centerView: centerView, leftView: leftView, rightView: rightView)
         self.topBar.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(self.topBar)
         
         //then do the collection view
         let layout : UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.scrollDirection = UICollectionViewScrollDirection.Vertical
+        layout.scrollDirection = UICollectionViewScrollDirection.vertical
         layout.minimumInteritemSpacing = ITEMS_INSETS_X
         layout.minimumLineSpacing = 50
         
-        self.collectionView = UICollectionView(frame: CGRectZero, collectionViewLayout: layout)
+        self.collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
         self.collectionView.translatesAutoresizingMaskIntoConstraints = false
-        self.collectionView.registerClass(ItemCellView.classForCoder(), forCellWithReuseIdentifier: ItemCellView.CELL_IDENTIFIER)
+        self.collectionView.register(ItemCellView.classForCoder(), forCellWithReuseIdentifier: ItemCellView.CELL_IDENTIFIER)
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
         self.collectionView.contentInset = UIEdgeInsets(top: TOP_BAR_HEIGHT + ITEMS_INSETS_Y, left: ITEMS_INSETS_X, bottom: ITEMS_INSETS_Y, right: ITEMS_INSETS_X)
         
         self.view.addSubview(self.collectionView)
-        self.view.bringSubviewToFront(self.topBar)
+        self.view.bringSubview(toFront: self.topBar)
         
-        let viewDict = ["topbar" : topBar, "collection" : collectionView]
+        let viewDict = ["topbar" : topBar, "collection" : collectionView] as [String : UIView]
         
-        self.view.addConstraint(NSLayoutConstraint(item: topBar, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1.0, constant: TOP_BAR_HEIGHT))
+        self.view.addConstraint(NSLayoutConstraint(item: topBar, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: TOP_BAR_HEIGHT))
         
-        self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[topbar]", options: [], metrics: nil, views: viewDict))
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[topbar]", options: [], metrics: nil, views: viewDict))
+
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[collection]|", options: [], metrics: nil, views: viewDict))
         
-        self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[collection]|", options: [], metrics: nil, views: viewDict))
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[topbar]|", options: [], metrics: nil, views: viewDict))
         
-        self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[topbar]|", options: [], metrics: nil, views: viewDict))
-        
-        self.view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[collection]|", options: [], metrics: nil, views: viewDict))
-        
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[collection]|", options: [], metrics: nil, views: viewDict))
     }
     
     /*
@@ -177,8 +176,8 @@ class LoadingViewController : UIViewController, LoadController {
     * This is so that if the content doesn't load the first time around, we can load it again
     *
     */
-    func handleLongPress(recognizer: UILongPressGestureRecognizer) {
-        if recognizer.state == .Began {
+    func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
+        if recognizer.state == .began {
             self.view.removeGestureRecognizer(recognizer)
             reloadContent()
         }
@@ -199,7 +198,7 @@ class LoadingViewController : UIViewController, LoadController {
         }
     }
     
-    func getItemAtIndex(index: Int) -> CellItem {
+    func getItemAtIndex(_ index: Int) -> CellItem {
         return TwitchGame(id: 0, viewers: 0, channels: 0, name: "nothing", thumbnails: ["hello" : "world"], logos: ["hello" : "world"])
     }
     
@@ -212,8 +211,8 @@ class LoadingViewController : UIViewController, LoadController {
 
 extension LoadingViewController : UICollectionViewDelegate {
     
-    func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.row == self.itemCount - 1 {
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if (indexPath as NSIndexPath).row == self.itemCount - 1 {
             loadMore()
         }
     }
@@ -226,18 +225,18 @@ extension LoadingViewController : UICollectionViewDelegate {
 
 extension LoadingViewController: UICollectionViewDelegateFlowLayout {
     
-    func collectionView(collectionView: UICollectionView,
+    func collectionView(_ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
-        sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        sizeForItemAt indexPath: IndexPath) -> CGSize {
             let width = collectionView.bounds.width / CGFloat(NUM_COLUMNS) - CGFloat(ITEMS_INSETS_X * 2)
             let height = width * HEIGHT_RATIO + (ItemCellView.LABEL_HEIGHT * 2) //There 2 labels, top & bottom
             
             return CGSize(width: width, height: height)
     }
     
-    func collectionView(collectionView: UICollectionView,
+    func collectionView(_ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
-        insetForSectionAtIndex section: Int) -> UIEdgeInsets {
+        insetForSectionAt section: Int) -> UIEdgeInsets {
             return UIEdgeInsets(top: TOP_BAR_HEIGHT + ITEMS_INSETS_Y, left: ITEMS_INSETS_X, bottom: ITEMS_INSETS_Y, right: ITEMS_INSETS_X)
     }
     
@@ -250,19 +249,19 @@ extension LoadingViewController: UICollectionViewDelegateFlowLayout {
 
 extension LoadingViewController : UICollectionViewDataSource {
     
-    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         //The number of sections
         return 1
     }
     
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         // If the count of games allows the current row to be full
         return self.itemCount
     }
     
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell : ItemCellView = collectionView.dequeueReusableCellWithReuseIdentifier(ItemCellView.CELL_IDENTIFIER, forIndexPath: indexPath) as! ItemCellView
-        cell.setRepresentedItem(self.getItemAtIndex(indexPath.row))
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell : ItemCellView = collectionView.dequeueReusableCell(withReuseIdentifier: ItemCellView.CELL_IDENTIFIER, for: indexPath) as! ItemCellView
+        cell.setRepresentedItem(self.getItemAtIndex((indexPath as NSIndexPath).row))
         return cell
     }
 }

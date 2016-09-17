@@ -15,12 +15,12 @@ class TwitchChatManager {
         return IRCCredentials(username: nil, password: nil, nick: "justinfan\(rnd)")
     }
     
-    private var connection : IRCConnection?
-    private var credentials : IRCCredentials?
-    private var capabilities = IRCCapabilities(capabilities: ["twitch.tv/tags"])
-    private var messageQueue : TwitchChatMessageQueue?
-    private var emotesDictionnary = [String : NSData]() //Dictionnary that holds all the emotes (Acts as cache)
-    private var consumer : ChatManagerConsumer?
+    fileprivate var connection : IRCConnection?
+    fileprivate var credentials : IRCCredentials?
+    fileprivate var capabilities = IRCCapabilities(capabilities: ["twitch.tv/tags"])
+    fileprivate var messageQueue : TwitchChatMessageQueue?
+    fileprivate var emotesDictionnary = [String : Data]() //Dictionnary that holds all the emotes (Acts as cache)
+    fileprivate var consumer : ChatManagerConsumer?
     
     init(consumer : ChatManagerConsumer) {
         self.consumer = consumer
@@ -41,10 +41,10 @@ class TwitchChatManager {
         connection?.disconnect()
     }
     
-    func joinTwitchChannel(channel : TwitchChannel) {
-        let dispatchTime: dispatch_time_t = dispatch_time(DISPATCH_TIME_NOW, Int64(3 * Double(NSEC_PER_SEC)))
-        dispatch_after(dispatchTime, dispatch_get_main_queue(), {
-            self.connection?.sendStringMessage("JOIN #\(channel.name)", immedtiately: true)
+    func joinTwitchChannel(_ channel : TwitchChannel) {
+        let dispatchTime: DispatchTime = DispatchTime.now() + Double(Int64(3 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
+        DispatchQueue.main.asyncAfter(deadline: dispatchTime, execute: {
+            self.connection?.sendStringMessage("JOIN #\(channel.name)", immediately: true)
         })
     }
     
@@ -52,7 +52,7 @@ class TwitchChatManager {
 // MARK - Command handlers
 /////////////////////////////////////////
     
-    private func handleMsg(message : IRCMessage) -> () {
+    fileprivate func handleMsg(_ message : IRCMessage) -> () {
         guard let _ = message.sender as String! else {
             return
         }
@@ -64,10 +64,10 @@ class TwitchChatManager {
         messageQueue?.addNewMessage(message)
     }
     
-    private func handle433(message : IRCMessage) -> () {
+    fileprivate func handle433(_ message : IRCMessage) -> () {
         Logger.Warning("Received 433 from server, invalid nick")
         credentials = TwitchChatManager.generateAnonymousIRCCredentials()
-        connection?.sendStringMessage("NICK \(credentials!.nick)", immedtiately: true)
+        connection?.sendStringMessage("NICK \(credentials!.nick)", immediately: true)
     }
 }
 
@@ -76,16 +76,16 @@ class TwitchChatManager {
 /////////////////////////////////////////
 
 extension TwitchChatManager : TwitchChatMessageQueueDelegate {
-    func handleProcessedAttributedString(message: NSAttributedString) {
+    func handleProcessedAttributedString(_ message: NSAttributedString) {
         self.consumer!.messageReadyForDisplay(message)
     }
-    func handleNewEmoteDownloaded(id: String, data : NSData) {
+    func handleNewEmoteDownloaded(_ id: String, data : Data) {
         emotesDictionnary[id] = data
     }
-    func hasEmoteInCache(id: String) -> Bool {
+    func hasEmoteInCache(_ id: String) -> Bool {
         return self.emotesDictionnary[id] != nil
     }
-    func getEmoteDataFromCache(id: String) -> NSData? {
+    func getEmoteDataFromCache(_ id: String) -> Data? {
         return self.emotesDictionnary[id]
     }
 }

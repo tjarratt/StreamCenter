@@ -13,12 +13,11 @@ class ChatMessageView : UIView {
     
     init(message: NSAttributedString, width : CGFloat, position : CGPoint) {
         let maxSize = CGSize(width: width, height: 10000)
-        let size = message.boundingRectWithSize(maxSize, options: [.UsesLineFragmentOrigin, .UsesFontLeading], context: nil)
+        let size = message.boundingRect(with: maxSize, options: [.usesLineFragmentOrigin, .usesFontLeading], context: nil)
         self.message = message
-        
+
         super.init(frame: CGRect(origin: position, size: CGSize(width: width, height: size.height+10)))
-        
-        self.backgroundColor = UIColor.clearColor()
+        self.backgroundColor = UIColor.clear
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -26,8 +25,8 @@ class ChatMessageView : UIView {
         super.init(coder: aDecoder)
     }
     
-    override func drawRect(rect: CGRect) {
-        super.drawRect(rect)
-        message.drawInRect(rect)
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        message.draw(in: rect)
     }
 }

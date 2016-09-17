@@ -49,9 +49,9 @@ class TwitchChatView : UIView {
 }
 
 extension TwitchChatView : ChatManagerConsumer {
-    func messageReadyForDisplay(message: NSAttributedString) {
+    func messageReadyForDisplay(_ message: NSAttributedString) {
         if self.shouldConsume {
-            dispatch_async(dispatch_get_main_queue(),{
+            DispatchQueue.main.async(execute: {
                 let view = ChatMessageView(message: message, width: self.bounds.width-40, position: CGPoint(x: 20, y: 0))
                 
                 var newFrame = view.frame
@@ -71,7 +71,7 @@ extension TwitchChatView : ChatManagerConsumer {
                 }
                 self.messageViews.append(view)
                 
-                self.insertSubview(view, atIndex: 0)
+                self.insertSubview(view, at: 0)
             })
         }
     }

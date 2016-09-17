@@ -9,7 +9,7 @@
 import Foundation
 
 class IRCCapabilities {
-    private var capabilities : [String]
+    fileprivate var capabilities : [String]
     
     init(){
         capabilities = [String]()
@@ -19,8 +19,8 @@ class IRCCapabilities {
         self.capabilities = capabilities
     }
     
-    func addCapabilities(capabilities : [String]) {
-        self.capabilities.appendContentsOf(capabilities)
+    func addCapabilities(_ capabilities : [String]) {
+        self.capabilities.append(contentsOf: capabilities)
     }
     
     func getIRCCommandString() -> String? {
