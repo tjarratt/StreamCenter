@@ -116,7 +116,7 @@ class TwitchSearchResultsViewController: LoadingViewController {
             for: .valueChanged
         )
         
-        super.configureViews("Search Results - \(searchTerm)", centerView: nil, leftView: self.searchTypeControl, rightView: nil)
+        super.configureViews("Search Results - \(searchTerm!)", centerView: nil, leftView: self.searchTypeControl, rightView: nil)
     }
     
     override func reloadContent() {

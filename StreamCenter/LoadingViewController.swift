@@ -260,7 +260,7 @@ extension LoadingViewController : UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell : ItemCellView = collectionView.dequeueReusableCell(withReuseIdentifier: ItemCellView.CELL_IDENTIFIER, for: indexPath) as! ItemCellView
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ItemCellView.CELL_IDENTIFIER, for: indexPath) as! ItemCellView
         cell.setRepresentedItem(self.getItemAtIndex((indexPath as NSIndexPath).row))
         return cell
     }

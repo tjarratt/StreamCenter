@@ -104,10 +104,10 @@ struct TwitchGame: CellItem {
     var subtitle: String {
         get {
             if viewers > 0 {
-                return "\(viewers) viewers"
+                return "\(viewers!) viewers"
             } else {
                 if popularity > 0 {
-                    return "popularity: \(popularity)"
+                    return "popularity: \(popularity!)"
                 }
             }
             //return blank so that the label is still rendered in the collection view (for spacing)

@@ -23,7 +23,7 @@ class TwitchChatView : UIView {
         
         self.backgroundColor = UIColor(hexString: "#19191F")
         
-        let topView = ChatTopView(frame: CGRect(x: 0, y: 0, width: self.bounds.width, height: 75), title: "#\(self.channel.name)")
+        let topView = ChatTopView(frame: CGRect(x: 0, y: 0, width: self.bounds.width, height: 75), title: "#\(self.channel.name!)")
         self.addSubview(topView)
     }
     

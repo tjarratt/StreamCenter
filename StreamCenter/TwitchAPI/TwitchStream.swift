@@ -73,7 +73,7 @@ struct TwitchStream: CellItem {
     
     var subtitle: String {
         get {
-            return "\(viewers) viewers on \(channel.name)"
+            return "\(viewers!) viewers on \(channel.name!)"
         }
     }
     
