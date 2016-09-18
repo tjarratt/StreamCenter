@@ -81,7 +81,7 @@ class TwitchStreamsViewController: LoadingViewController {
     }
     
     fileprivate func configureViews() {
-        super.configureViews("Live Streams - \(self.game!.name)", centerView: nil, leftView: nil, rightView: nil)
+        super.configureViews("Live Streams - \(self.game.name!)", centerView: nil, leftView: nil, rightView: nil)
     }
     
     override func reloadContent() {
