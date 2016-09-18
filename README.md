@@ -40,7 +40,7 @@ StreamCenter as of today, you'll need to compile it from source and install it y
 ![Imgur](http://i.imgur.com/IhRWcT2.jpg)
 
 # Contributing
-Many thanks to Olivier Boucher and Brendan Kirchner for creating the project.
-Huge thanks to @waterskier2007 for the support.  
-If anyone wishes to contribute, just email us for info.
-We're looking for contributors to integrate other platforms
+* Many thanks to Olivier Boucher and Brendan Kirchner for creating the project.
+* Huge thanks to @waterskier2007 for the support.  
+* If anyone wishes to contribute, just email us for info.
+* We're looking for contributors to integrate other platforms
