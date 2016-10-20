@@ -56,7 +56,7 @@ extension String {
         return self[from..<end]
     }
     func substring(_ from: Int, length: Int) -> String {
-        let end = from + length
+        let end = from + length + 1
         return self[from..<end]
     }
 }

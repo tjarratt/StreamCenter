@@ -44,7 +44,7 @@ class TwitchChatManager {
     func joinTwitchChannel(_ channel : TwitchChannel) {
         let dispatchTime: DispatchTime = DispatchTime.now() + Double(Int64(3 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
         DispatchQueue.main.asyncAfter(deadline: dispatchTime, execute: {
-            self.connection?.sendStringMessage("JOIN #\(channel.name)", immediately: true)
+            self.connection?.sendStringMessage("JOIN #\(channel.name!)", immediately: true)
         })
     }
     
